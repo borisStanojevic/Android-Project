@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.student.myproject">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/login"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PostsActivity"
+            android:label="@string/posts"
+            />
+        <activity android:name=".CreatePostActivity"
+            android:label="@string/create_post"
+            />
+        <activity android:name=".ReadPostActivity"
+            android:label="@string/read_post"
+            />
+        <activity android:name=".SettingsActivity"
+            android:label="@string/settings"
+            />
+    </application>
+
+</manifest>
