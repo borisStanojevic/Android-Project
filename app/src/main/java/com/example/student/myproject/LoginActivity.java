@@ -13,7 +13,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
     }
 
-    public void btnStartPostsActivity(View view)
+    public void doLogin(View view)
     {
         //Omoguciti da se iz ove aktivnosti startuje PostsActivity
         Intent intent = new Intent(this, PostsActivity.class);
