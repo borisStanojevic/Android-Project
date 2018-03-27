@@ -1,44 +1,46 @@
 package com.example.student.myproject;
 
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceFragment {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        addPreferencesFromResource(R.xml.preferences);
+
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
     }
 
-    @Override
-    protected void  onRestart(){
-        super.onRestart();
-    }
+//    @Override
+//    public void onRestart(){
+//        super.onRestart();
+//    }
 
     @Override
-    protected void onResume(){
+    public void onResume(){
         super.onResume();
     }
 
     @Override
-    protected void onPause(){
+    public void onPause(){
         super.onPause();
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
     }
 }

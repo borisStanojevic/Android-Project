@@ -14,4 +14,8 @@
     <string name="create_post_hint">Post something</string>
     <string name="confirm_post_txt">Post</string>
     <string name="cancel_post_txt">Cancel</string>
+    <string name="tags_hint">Add tags</string>
+    <string name="pref_posts">Posts Preferences</string>
+    <string name="pref_comments">Comments Preferences</string>
+    <string name="pref_posts_sorting">Sorting</string>
 </resources>
