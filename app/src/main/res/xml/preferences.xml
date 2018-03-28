@@ -3,13 +3,6 @@
  <PreferenceCategory
      android:title="@string/pref_posts"
      android:key="pref_posts">
-  <ListPreference
-      android:dependency="pref_sync"
-      android:key="pref_syncConnectionType"
-      android:title="@string/pref_posts_sorting"
-      android:dialogTitle="@string/pref_posts_sorting"
-      android:entries="@array/pref_posts_sorting_entries"
-  />
 
  </PreferenceCategory>
 

@@ -1,11 +1,10 @@
 package com.example.student.myproject;
 
+import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-public class SettingsActivity extends PreferenceFragment {
+public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -20,17 +19,17 @@ public class SettingsActivity extends PreferenceFragment {
     }
 
 //    @Override
-//    public void onRestart(){
+//    public void onRestart() {
 //        super.onRestart();
 //    }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
     }
 

@@ -1,7 +1,7 @@
 package com.example.student.myproject;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 public class CreatePostActivity extends AppCompatActivity {
 
@@ -17,17 +17,17 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void  onRestart(){
+    protected void onRestart() {
         super.onRestart();
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
     }
 
