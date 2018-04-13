@@ -18,4 +18,7 @@
     <string name="pref_posts">Posts Preferences</string>
     <string name="pref_comments">Comments Preferences</string>
     <string name="pref_posts_sorting">Sorting</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
 </resources>

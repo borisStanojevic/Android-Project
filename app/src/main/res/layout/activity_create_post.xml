@@ -1,28 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/cp_drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginLeft="2.5dp"
-    android:layout_marginRight="2.5dp"
-    android:paddingTop="10dp"
-    tools:context="com.example.student.myproject.CreatePostActivity">
-    
-    <EditText
-        android:id="@+id/et_post_description"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:inputType="text|textMultiLine"
-        android:hint="@string/create_post_hint"
-        />
+    android:layout_width="match_parent">
 
-    <EditText
-        android:id="@+id/et_post_tags"
+    <!-- Glavni sadrzaj -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/tags_hint"
-        />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="2.5dp"
+        android:layout_marginRight="2.5dp"
+        android:paddingTop="10dp"
+        tools:context="com.example.student.myproject.CreatePostActivity">
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/et_post_description"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:inputType="text|textMultiLine"
+            android:hint="@string/create_post_hint"
+            />
+
+        <EditText
+            android:id="@+id/et_post_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/tags_hint"
+            />
+    </LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>

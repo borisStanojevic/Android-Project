@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_posts_sorting_entries">Date, Popularity</string-array>
+    <string-array name="activities_array">
+        <item>Create Post</item>
+        <item>All Posts</item>
+        <item>Settings</item>
+    </string-array>
 </resources>
