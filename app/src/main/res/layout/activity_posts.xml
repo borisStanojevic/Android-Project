@@ -1,30 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     tools:context="com.example.student.myproject.PostsActivity">
 
-    <Button
-        android:text="@string/start_create_post"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="btnStartCreatePostActivity"
-        />
-    <Button
-        android:text="@string/start_read_post"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="btnStartReadPostActivity"
-        />
-    <Button
-        android:text="@string/start_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="btnStartSettingsActivity"
-        />
+    <include layout="@layout/app_bar" />
 
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/posts_drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2.5dp"
+        android:layout_marginRight="2.5dp"
+        android:paddingTop="10dp">
+
+        <!-- Glavni sadrzaj kad nije navigation drawer prevucen -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2.5dp"
+            android:layout_marginRight="2.5dp"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            tools:context="com.example.student.myproject.PostsActivity">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="btnStartCreatePostActivity"
+                android:text="@string/start_create_post" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="btnStartReadPostActivity"
+                android:text="@string/start_read_post" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="btnStartSettingsActivity"
+                android:text="@string/start_settings" />
+
+        </LinearLayout>
+
+        <!-- includujemo sadrzaj koji se prikazuje kad prevucemo navigation drawer a koji se nalazi layout/navigation_view-->
+        <include layout="@layout/navigation_view" />
+
+    </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

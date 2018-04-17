@@ -1,36 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
-    android:id="@+id/cp_drawer_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:orientation="vertical"
+    tools:context="com.example.student.myproject.CreatePostActivity">
 
-    <!-- Glavni sadrzaj -->
-    <LinearLayout
+    <include layout="@layout/app_bar" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/create_post_drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:layout_marginLeft="2.5dp"
         android:layout_marginRight="2.5dp"
-        android:paddingTop="10dp"
-        tools:context="com.example.student.myproject.CreatePostActivity">
+        android:paddingTop="10dp">
 
-        <EditText
-            android:id="@+id/et_post_description"
+        <!-- Glavni sadrzaj kad nije navigation drawer prevucen -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:inputType="text|textMultiLine"
-            android:hint="@string/create_post_hint"
-            />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2.5dp"
+            android:layout_marginRight="2.5dp"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            tools:context="com.example.student.myproject.CreatePostActivity">
 
-        <EditText
-            android:id="@+id/et_post_tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/tags_hint"
-            />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/et_post_description"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:hint="@string/create_post_hint"
+                android:inputType="text|textMultiLine" />
 
-</android.support.v4.widget.DrawerLayout>
+            <EditText
+                android:id="@+id/et_post_tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:hint="@string/tags_hint" />
+        </LinearLayout>
+
+        <!-- includujemo sadrzaj koji se prikazuje kad prevucemo navigation drawer a koji se nalazi layout/navigation_view-->
+        <include layout="@layout/navigation_view" />
+
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

@@ -13,15 +13,16 @@
         android:id="@+id/read_post_drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="2.5dp"
-        android:layout_marginRight="2.5dp"
+
         android:paddingTop="10dp">
 
         <!-- Glavni sadrzaj kad nije navigation drawer prevucen -->
-        <LinearLayout
-            android:layout_marginTop="7dp"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="15dp"
             android:orientation="vertical">
 
 
@@ -29,46 +30,83 @@
                 android:id="@+id/tv_post_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="5dp"
-                android:text="Here goes post title..." />
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="5dp" />
 
             <TextView
+                android:id="@+id/tv_post_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:inputType="text|textMultiLine"
-                android:text="And here goes \n whatever \n the content is..." />
+                android:layout_below="@id/tv_post_title"
+                android:layout_marginBottom="5dp" />
 
             <View
+                android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_below="@id/tv_post_content"
                 android:background="#000000" />
 
             <TextView
+                android:id="@+id/tv_post_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Author" />
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/divider" />
 
             <TextView
+                android:id="@+id/tv_date_posted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="21/01/2018" />
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/divider" />
 
             <TextView
+                android:id="@+id/tv_location_posted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Brooklyn, NY, USA" />
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/tv_date_posted" />
 
             <TextView
+                android:id="@+id/tv_post_tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="just, some, tags, whatever, dunno, dolphins, turtles, orcas"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/tv_location_posted"
                 android:textStyle="italic" />
-        </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_like_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/tv_post_tags"
+                android:text="Like  " />
+
+            <Button
+                android:id="@+id/btn_dislike_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/btn_like_post"
+                android:layout_below="@id/tv_post_tags"
+                android:text="Dislike" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_margin="16dp"
+                android:elevation="8dp"
+                android:src="@drawable/ic_launcher_background" />
+
+        </RelativeLayout>
 
         <!-- includujemo sadrzaj koji se prikazuje kad prevucemo navigation drawer a koji se nalazi layout/navigation_view-->
         <include layout="@layout/navigation_view" />
 
     </android.support.v4.widget.DrawerLayout>
+
 </LinearLayout>
