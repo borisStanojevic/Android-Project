@@ -8,8 +8,9 @@ import android.widget.TextView;
 import com.example.student.myproject.R;
 import com.example.student.myproject.ReadPostActivity;
 
-import org.w3c.dom.Text;
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +33,50 @@ public class Post {
     public Post() {
         tags = new ArrayList<Tag>();
         comments = new ArrayList<Comment>();
+    }
+
+    //Konstruktor kojim ce se od JSON-a koji ce dolaziti sa servera konstruisati Post objekat
+    //Trebam doraditi ovaj konstruktor trenutno cu ga koristiti samo za PostsActivity
+    public Post(JSONObject json)
+    {
+        try
+        {
+            this.id = json.getInt("id");
+            this.title = json.getString("title");
+            this.content = json.getString("content");
+            this.author = new User();
+            this.author.setUsername(json.getString("authorUsername"));
+            this.likes = json.getInt("likes");
+            this.dislikes = json.getInt("dislikes");
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    //Metoda koja vraca Java listu objekata Post za dobijeni JSON niz
+    public static List<Post> getPostsFromJSON(JSONArray jsonArray)
+    {
+        ArrayList<Post> posts = new ArrayList<>();
+        for (int i = 0 ; i < jsonArray.length() ; i++)
+        {
+            try
+            {
+                posts.add(new Post(jsonArray.getJSONObject(i)));
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return posts;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public int getId() {

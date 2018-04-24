@@ -17,11 +17,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.student.myproject.adapters.PostsAdapter;
+import com.example.student.myproject.model.Post;
+import com.example.student.myproject.model.User;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class PostsActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
+    private ListView postsListView;
+    public static List<Post> postsList;
+    private PostsAdapter postsAdapter;
     private ListView drawerList;
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
@@ -35,6 +46,16 @@ public class PostsActivity extends AppCompatActivity {
 
         private void selectItem(int position) {
             Toast.makeText(PostsActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class PostsItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            int postId = postsList.get(position).getId();
+            Intent intent = new Intent(PostsActivity.this, ReadPostActivity.class);
+            intent.putExtra("postId", postId);
+            startActivity(intent);
         }
     }
 
@@ -83,6 +104,39 @@ public class PostsActivity extends AppCompatActivity {
         stringArrayAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawerListItems);
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        //U sledecim linijama instanciram postsListView, listu objekata, adapter, postavljam adapter i eventualno postavljam slusac dogadjaja za klik na stavku
+        postsListView = (ListView) findViewById(R.id.posts_list_view);
+        postsList = new ArrayList<>();
+
+        Post p = new Post();
+        User u = new User();
+        u.setUsername("tarmiricmi123");
+        p.setId(1);
+        p.setTitle("Just Some Random Post");
+        p.setContent("Just some random content on a very random post by\n a very random guuuuuuuuy....");
+        p.setAuthor(u);
+        p.setDate(new Date());
+        p.setLikes(71);
+        p.setDislikes(4);
+        postsList.add(p);
+        Post p2 = new Post();
+        User u2 = new User();
+        u2.setUsername("tarmiricmi123");
+        p2.setId(2);
+        p2.setTitle("Just Some Random Post 2");
+        p2.setContent("Just some random content  2  on a very random post 2222222 by\n a very random guuuuuuuuy  2....");
+        p2.setAuthor(u2);
+        p2.setDate(new Date());
+        p2.setLikes(10);
+        p2.setDislikes(0);
+        postsList.add(p2);
+
+        postsAdapter = new PostsAdapter(this, postsList);
+
+        postsListView.setAdapter(postsAdapter);
+
+        postsListView.setOnItemClickListener(new PostsItemClickListener());
     }
 
     public void btnStartCreatePostActivity(View view) {

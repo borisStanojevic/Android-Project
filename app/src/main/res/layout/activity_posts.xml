@@ -23,7 +23,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="2.5dp"
             android:layout_marginRight="2.5dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingTop="10dp"
             tools:context="com.example.student.myproject.PostsActivity">
 
@@ -44,6 +44,8 @@
                 android:layout_height="wrap_content"
                 android:onClick="btnStartSettingsActivity"
                 android:text="@string/start_settings" />
+
+            <include layout="@layout/posts_list_view" />
 
         </LinearLayout>
 

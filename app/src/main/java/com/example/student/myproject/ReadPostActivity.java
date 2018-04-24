@@ -1,5 +1,6 @@
 package com.example.student.myproject;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -89,32 +90,21 @@ public class ReadPostActivity extends AppCompatActivity {
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        //Test Test Test
-        User u = new User();
-        u.setUsername("tarmiricmi123");
-        Tag t1 = new Tag();
-        t1.setId(1);
-        t1.setName("dolphins");
-        Tag t2 = new Tag();
-        t2.setId(2);
-        t2.setName("turtles");
-        Tag t3 = new Tag();
-        t3.setId(3);
-        t3.setName("aligators");
+        Intent i = getIntent();
+        int postId = i.getIntExtra("postId", -1);
+        Post post = null;
+        for(Post p : PostsActivity.postsList)
+        {
+            if(p.getId() == postId)
+            {
+                post = p;
+                break;
+            }
+        }
+        if(post == null)
+            post = new Post();
 
-        Post p = new Post();
-        p.setId(1);
-        p.setTitle("Just Some Random Post");
-        p.setContent("Just some random content on a very random post by\n a very random guuuuuuuuy....");
-        p.setAuthor(u);
-        p.setDate(new Date());
-        p.getTags().add(t1);
-        p.getTags().add(t2);
-        p.getTags().add(t3);
-        p.setLikes(71);
-        p.setDislikes(4);
-
-        p.showInLayout(this);
+        post.showInLayout(this);
     }
 
     //Dodavam svoj meni na toolbar
