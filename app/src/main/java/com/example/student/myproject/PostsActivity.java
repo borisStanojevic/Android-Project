@@ -1,7 +1,9 @@
 package com.example.student.myproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,6 +24,9 @@ import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -59,10 +64,61 @@ public class PostsActivity extends AppCompatActivity {
         }
     }
 
+    private Comparator<Post> createPostComparator(String key)
+    {
+        if ("date_asc".equalsIgnoreCase(key))
+        {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return  o1.getDate().compareTo(o2.getDate());
+                }
+            };
+        }
+        else if("pop_asc".equalsIgnoreCase(key))
+        {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o1.getLikes() - o2.getLikes();
+                }
+            };
+        }
+        else if("pop_desc".equalsIgnoreCase(key))
+        {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o2.getLikes() - o1.getLikes();
+                }
+            };
+        }
+        else
+        {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o2.getDate().compareTo(o1.getDate());
+                }
+            };
+        }
+    }
+
+    private void sortPosts(List<Post> posts)
+    {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String postsSortingKey = sharedPreferences.getString("posts_preference", "date_desc");
+        Comparator<Post> postComparator  = createPostComparator(postsSortingKey);
+        Collections.sort(posts, postComparator);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts);
+
+        //Postavljam defaultne vrijednosti podesavanja ( sortiranje komentara i objava po datumu )
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -127,16 +183,22 @@ public class PostsActivity extends AppCompatActivity {
         p2.setTitle("Just Some Random Post 2");
         p2.setContent("Just some random content  2  on a very random post 2222222 by\n a very random guuuuuuuuy  2....");
         p2.setAuthor(u2);
-        p2.setDate(new Date());
+        p2.setDate(new Date("2018/05/05"));
         p2.setLikes(10);
         p2.setDislikes(0);
         postsList.add(p2);
+
+        sortPosts(postsList);
 
         postsAdapter = new PostsAdapter(this, postsList);
 
         postsListView.setAdapter(postsAdapter);
 
         postsListView.setOnItemClickListener(new PostsItemClickListener());
+
+
+        Toast.makeText(this, PreferenceManager.getDefaultSharedPreferences(this).getString("posts_preference", ""), Toast.LENGTH_LONG).show();
+
     }
 
     public void btnStartCreatePostActivity(View view) {
@@ -210,6 +272,13 @@ public class PostsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        sortPosts(postsList);
+
+        Toast.makeText(this, PreferenceManager.getDefaultSharedPreferences(this).getString("posts_preference", ""),Toast.LENGTH_LONG).show();
+
+        postsAdapter = new PostsAdapter(this, postsList);
+        postsListView.setAdapter(postsAdapter);
+
     }
 
     @Override

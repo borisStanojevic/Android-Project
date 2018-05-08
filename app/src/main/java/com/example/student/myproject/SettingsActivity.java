@@ -17,15 +17,13 @@ public class SettingsActivity extends PreferenceActivity {
         super.onStart();
     }
 
-//    @Override
-//    public void onRestart() {
-//        super.onRestart();
-//    }
-
     @Override
     public void onResume() {
         super.onResume();
     }
+
+    @Override
+    protected void onRestart() { super.onRestart(); }
 
     @Override
     public void onPause() {
