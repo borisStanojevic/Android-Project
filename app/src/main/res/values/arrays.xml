@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="pref_posts_sorting_entries">Date, Popularity</string-array>
+    <string-array name="pref_sorting_entries">
+        <item>Date - Ascending</item>
+        <item>Date - Descending</item>
+        <item>Popularity - Ascending</item>
+        <item>Popularity - Descending</item>
+    </string-array>
+
+    <string-array name="pref_sorting_entries_values">
+        <item>date_asc</item>
+        <item>date_desc</item>
+        <item>pop_asc</item>
+        <item>pop_desc</item>
+    </string-array>
+
     <string-array name="activities_array">
         <item>Create Post</item>
         <item>All Posts</item>

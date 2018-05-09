@@ -48,7 +48,7 @@ public class PostsAdapter extends ArrayAdapter<Post> {
         tvTitle.setText(post.getTitle());
         tvContent.setText(post.getContent());
         tvAuthor.setText(post.getAuthor().getUsername());
-        tvDatePosted.setText(new SimpleDateFormat("yyyy/mm/dd").format(post.getDate()).toString());
+        tvDatePosted.setText(new SimpleDateFormat("yyyy/MM/dd").format(post.getDate()).toString());
         tvLikes.setText(String.valueOf(post.getLikes()) + " ");
         tvDislikes.setText(" " + String.valueOf(post.getDislikes()));
 

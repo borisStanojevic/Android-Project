@@ -17,11 +17,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.student.myproject.adapters.CommentsAdapter;
+import com.example.student.myproject.model.Comment;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.Tag;
 import com.example.student.myproject.model.User;
 
 import java.util.Date;
+import java.util.List;
 
 public class ReadPostActivity extends AppCompatActivity {
 
@@ -29,6 +32,12 @@ public class ReadPostActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
+
+    //Ovdje stade Rile Veliki
+    private ListView commentsList;
+    private List<Comment> comments;
+    private CommentsAdapter commentsAdapter;
+
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru

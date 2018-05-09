@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
- <PreferenceCategory
-     android:title="@string/pref_posts"
-     android:key="pref_posts">
+    <PreferenceCategory android:title="@string/pref_posts">
+        <ListPreference
+            android:defaultValue="@string/pref_sorting_default"
+            android:entries="@array/pref_sorting_entries"
+            android:entryValues="@array/pref_sorting_entries_values"
+            android:key="posts_preference"
+            android:title="@string/pref_posts_sorting" />
+    </PreferenceCategory>
 
- </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_comments">
+        <ListPreference
+            android:defaultValue="@string/pref_sorting_default"
+            android:entries="@array/pref_sorting_entries"
+            android:entryValues="@array/pref_sorting_entries_values"
+            android:key="comments_preference"
+            android:title="@string/pref_posts_sorting" />
+    </PreferenceCategory>
 
- <PreferenceCategory
-     android:title="@string/pref_comments"
-     android:key="pref_comments">
-
- </PreferenceCategory>
 </PreferenceScreen>

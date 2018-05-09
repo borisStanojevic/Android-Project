@@ -167,7 +167,7 @@ public class Post {
         TextView tvPostAuthor = (TextView) activity.findViewById(R.id.tv_post_author);
         tvPostAuthor.setText(this.author.getUsername());
         TextView tvDatePosted = (TextView) activity.findViewById(R.id.tv_date_posted);
-        tvDatePosted.setText(new SimpleDateFormat("yyyy/mm/dd").format(this.date));
+        tvDatePosted.setText(new SimpleDateFormat("yyyy/MM/dd").format(this.date));
         TextView tvLocationPosted = (TextView) activity.findViewById(R.id.tv_location_posted);
         tvLocationPosted.setText("Daaaaleko daaaleko");
         TextView tvTags = (TextView) activity.findViewById(R.id.tv_post_tags);

@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/tv_post_tags"
-                android:text="Like  " />
+                android:text="@string/like" />
 
             <Button
                 android:id="@+id/btn_dislike_post"
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/btn_like_post"
                 android:layout_below="@id/tv_post_tags"
-                android:text="Dislike" />
+                android:text="@string/dislike" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
