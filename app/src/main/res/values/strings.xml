@@ -24,7 +24,5 @@
     <string name="pref_sorting_default">date_desc</string>
     <string name="dislike">Dislike</string>
     <string name="like">Like</string>
-    <string name="dislike">Dislike</string>
-    <string name="like">Like</string>
 
 </resources>
