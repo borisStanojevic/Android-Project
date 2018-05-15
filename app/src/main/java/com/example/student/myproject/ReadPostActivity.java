@@ -41,7 +41,8 @@ public class ReadPostActivity extends AppCompatActivity {
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+    private class DrawerItemClickListener implements ListView.OnItemClickListener
+    {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             selectItem(position);
