@@ -1,8 +1,20 @@
 package com.example.student.myproject;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +36,6 @@ public class CreatePostActivity extends AppCompatActivity {
     private ListView drawerList;
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
-
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -36,6 +47,9 @@ public class CreatePostActivity extends AppCompatActivity {
             Toast.makeText(CreatePostActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
         }
     }
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private Criteria criteria;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +141,52 @@ public class CreatePostActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    //Inicijalizovanje nekih stvari da bi se omogucilo dobijanje lokacije
+    public void initLocationConfig(LocationManager locationManager, LocationListener locationListener, Criteria criteria)
+    {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        criteria = new Criteria();
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setSpeedRequired(true);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(false);
+    }
+
+    //Metoda koja vraca poslednju znanu lokaciju uredjaja
+    private Location getPostLocation(LocationManager locationManager, LocationListener locationListener, Criteria criteria)
+    {
+        String locationProvider = locationManager.getBestProvider(criteria, true);
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION != PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(this, "LOCATION ACCESS is off.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        return locationManager.getLastKnownLocation(locationProvider);
     }
 
     @Override
