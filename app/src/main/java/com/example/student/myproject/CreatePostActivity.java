@@ -36,6 +36,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private ListView drawerList;
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
+
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -47,6 +48,7 @@ public class CreatePostActivity extends AppCompatActivity {
             Toast.makeText(CreatePostActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
         }
     }
+
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Criteria criteria;
@@ -144,8 +146,7 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     //Inicijalizovanje nekih stvari da bi se omogucilo dobijanje lokacije
-    public void initLocationConfig(LocationManager locationManager, LocationListener locationListener, Criteria criteria)
-    {
+    public void initLocationConfig(LocationManager locationManager, LocationListener locationListener, Criteria criteria) {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -178,11 +179,9 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     //Metoda koja vraca poslednju znanu lokaciju uredjaja
-    private Location getPostLocation(LocationManager locationManager, LocationListener locationListener, Criteria criteria)
-    {
+    private Location getPostLocation(LocationManager locationManager, LocationListener locationListener, Criteria criteria) {
         String locationProvider = locationManager.getBestProvider(criteria, true);
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION != PackageManager.PERMISSION_GRANTED)
-        {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "LOCATION ACCESS is off.", Toast.LENGTH_SHORT).show();
             return null;
         }

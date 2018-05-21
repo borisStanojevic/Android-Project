@@ -212,7 +212,7 @@ public class PostsActivity extends AppCompatActivity {
     }
 
     public void btnStartSettingsActivity(View view) {
-        Intent i = new Intent(this, SettingsActivity.class);
+        Intent i = new Intent(this, TestActivity.class);
         startActivity(i);
     }
 

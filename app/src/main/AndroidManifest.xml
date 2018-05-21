@@ -3,9 +3,9 @@
     package="com.example.student.myproject">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    3 <uses-permission android:name="android.permission.INTERNET" />
-    4 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    5 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.network"/>
 
     <application
         android:allowBackup="true"
@@ -20,18 +20,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PostsActivity"
-            android:label="@string/posts"
-            />
-        <activity android:name=".CreatePostActivity"
-            android:label="@string/create_post"
-            />
-        <activity android:name=".ReadPostActivity"
-            android:label="@string/read_post"
-            />
-        <activity android:name=".SettingsActivity"
-            android:label="@string/settings"
-            />
+        <activity
+            android:name=".PostsActivity"
+            android:label="@string/posts" />
+        <activity
+            android:name=".CreatePostActivity"
+            android:label="@string/create_post" />
+        <activity
+            android:name=".ReadPostActivity"
+            android:label="@string/read_post" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings" />
+        <activity android:name=".TestActivity"></activity>
     </application>
 
 </manifest>
