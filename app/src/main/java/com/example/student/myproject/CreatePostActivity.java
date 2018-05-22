@@ -19,14 +19,30 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.student.myproject.adapters.PostsAdapter;
+import com.example.student.myproject.model.Post;
+import com.example.student.myproject.model.Tag;
+import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.UserService;
+import com.example.student.myproject.util.Util;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CreatePostActivity extends AppCompatActivity {
 
@@ -36,6 +52,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private ListView drawerList;
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
+    private String loggedInUserUsername;
 
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -48,10 +65,6 @@ public class CreatePostActivity extends AppCompatActivity {
             Toast.makeText(CreatePostActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
         }
     }
-
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    private Criteria criteria;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +113,8 @@ public class CreatePostActivity extends AppCompatActivity {
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
+        loggedInUserUsername = getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null);
+
     }
 
     //Dodavam svoj meni na toolbar
@@ -120,10 +135,56 @@ public class CreatePostActivity extends AppCompatActivity {
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
             case R.id.action_do_post:
-                Toast.makeText(this, "You just clicked Post action item", Toast.LENGTH_SHORT).show();
+                String title = ((EditText)findViewById(R.id.et_post_title)).getText().toString();
+                String content = ((EditText)findViewById(R.id.et_post_content)).getText().toString();
+                String tags = ((EditText)findViewById(R.id.et_post_tags)).getText().toString();
+                String[] tagsTokens;
+                try
+                {
+                    tagsTokens = tags.split(",");
+                }
+                catch (Exception exc)
+                {
+                    tagsTokens = new String[0];
+                }
+
+                Post post = new Post();
+                post.setTitle(title);
+                post.setContent(content);
+                User author = new User();
+                author.setUsername(loggedInUserUsername);
+                post.setAuthor(author);
+                for(int i = 0 ; i < tagsTokens.length ; i++)
+                {
+                    if(tagsTokens[i] != null && !"".equals(tagsTokens[i]))
+                    {
+                        Tag tag = new Tag();
+                        tag.setName(tagsTokens[i].trim());
+                        post.getTags().add(tag);
+                    }
+                }
+
+                PostService postService = Util.retrofit.create(PostService.class);
+                final Call<Post> call = postService.doCreatePost(post);
+                call.enqueue(new Callback<Post>() {
+                    @Override
+                    public void onResponse(Call<Post> call, Response<Post> response)
+                    {
+                        Intent intent = new Intent(CreatePostActivity.this, PostsActivity.class);
+                        startActivity(intent);
+                    }
+                    @Override
+                    public void onFailure(Call<Post> call, Throwable t)
+                    {
+                        Toast.makeText(CreatePostActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
                 break;
             case R.id.action_do_cancel_post:
-                Toast.makeText(this, "You just clicked Cancel action item", Toast.LENGTH_SHORT).show();
+                ((EditText)findViewById(R.id.et_post_content)).getText().clear();
+                ((EditText)findViewById(R.id.et_post_tags)).getText().toString();
+                Intent intent = new Intent(CreatePostActivity.this, PostsActivity.class );
+                startActivity(intent);
                 break;
             default:
                 break;
@@ -143,49 +204,6 @@ public class CreatePostActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    //Inicijalizovanje nekih stvari da bi se omogucilo dobijanje lokacije
-    public void initLocationConfig(LocationManager locationManager, LocationListener locationListener, Criteria criteria) {
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setSpeedRequired(true);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(false);
-    }
-
-    //Metoda koja vraca poslednju znanu lokaciju uredjaja
-    private Location getPostLocation(LocationManager locationManager, LocationListener locationListener, Criteria criteria) {
-        String locationProvider = locationManager.getBestProvider(criteria, true);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "LOCATION ACCESS is off.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        return locationManager.getLastKnownLocation(locationProvider);
     }
 
     @Override

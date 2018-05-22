@@ -1,24 +1,16 @@
 package com.example.student.myproject.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tag {
 
-    private int id;
     private String name;
-    private List<Post> posts;
+    private transient List<Post> posts;
 
     public Tag()
     {
-
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        posts = new ArrayList<>();
     }
 
     public String getName() {

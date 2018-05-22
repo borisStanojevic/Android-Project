@@ -2,40 +2,26 @@ package com.example.student.myproject.model;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
 
-    private int id;
-    private String name;
+    private String fullName;
     private Bitmap photo;
     private String username;
     private String password;
-    private List<Post> posts;
-    private List<Comment> comments;
+    private String email;
 
-    public User()
-    {
+    private transient List<Post> posts;
+    private transient List<Comment> comments;
+
+    public User() {
         posts = new ArrayList<Post>();
         comments = new ArrayList<Comment>();
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Bitmap getPhoto() {
         return photo;
@@ -68,5 +54,30 @@ public class User {
     public List<Comment> getComments() {
         return comments;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
 
 }

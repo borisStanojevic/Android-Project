@@ -1,5 +1,6 @@
 package com.example.student.myproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 import com.example.student.myproject.adapters.PostsAdapter;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.Util;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,6 +32,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostsActivity extends AppCompatActivity {
 
@@ -64,52 +71,43 @@ public class PostsActivity extends AppCompatActivity {
         }
     }
 
-    private Comparator<Post> createPostComparator(String key)
-    {
-        if ("date_asc".equalsIgnoreCase(key))
-        {
-            return new Comparator<Post>() {
-                @Override
-                public int compare(Post o1, Post o2) {
-                    return  o1.getDate().compareTo(o2.getDate());
-                }
-            };
-        }
-        else if("pop_asc".equalsIgnoreCase(key))
-        {
-            return new Comparator<Post>() {
-                @Override
-                public int compare(Post o1, Post o2) {
-                    return o1.getLikes() - o2.getLikes();
-                }
-            };
-        }
-        else if("pop_desc".equalsIgnoreCase(key))
-        {
-            return new Comparator<Post>() {
-                @Override
-                public int compare(Post o1, Post o2) {
-                    return o2.getLikes() - o1.getLikes();
-                }
-            };
-        }
-        else
-        {
-            return new Comparator<Post>() {
-                @Override
-                public int compare(Post o1, Post o2) {
-                    return o2.getDate().compareTo(o1.getDate());
-                }
-            };
-        }
-    }
+//    private Comparator<Post> createPostComparator(String key) {
+//        if ("date_asc".equalsIgnoreCase(key)) {
+//            return new Comparator<Post>() {
+//                @Override
+//                public int compare(Post o1, Post o2) {
+//                    return o1.getDate().compareTo(o2.getDate());
+//                }
+//            };
+//        } else if ("pop_asc".equalsIgnoreCase(key)) {
+//            return new Comparator<Post>() {
+//                @Override
+//                public int compare(Post o1, Post o2) {
+//                    return o1.getLikes() - o2.getLikes();
+//                }
+//            };
+//        } else if ("pop_desc".equalsIgnoreCase(key)) {
+//            return new Comparator<Post>() {
+//                @Override
+//                public int compare(Post o1, Post o2) {
+//                    return o2.getLikes() - o1.getLikes();
+//                }
+//            };
+//        } else {
+//            return new Comparator<Post>() {
+//                @Override
+//                public int compare(Post o1, Post o2) {
+//                    return o2.getDate().compareTo(o1.getDate());
+//                }
+//            };
+//        }
+//    }
 
-    private void sortPosts(List<Post> posts)
-    {
+    private void sortPosts(List<Post> posts) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String postsSortingKey = sharedPreferences.getString("posts_preference", "date_desc");
-        Comparator<Post> postComparator  = createPostComparator(postsSortingKey);
-        Collections.sort(posts, postComparator);
+//        Comparator<Post> postComparator = createPostComparator(postsSortingKey);
+//        Collections.sort(posts, postComparator);
     }
 
     @Override
@@ -161,44 +159,6 @@ public class PostsActivity extends AppCompatActivity {
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        //U sledecim linijama instanciram postsListView, listu objekata, adapter, postavljam adapter i eventualno postavljam slusac dogadjaja za klik na stavku
-        postsListView = (ListView) findViewById(R.id.posts_list_view);
-        postsList = new ArrayList<>();
-
-        Post p = new Post();
-        User u = new User();
-        u.setUsername("tarmiricmi123");
-        p.setId(1);
-        p.setTitle("Just Some Random Post");
-        p.setContent("Just some random content on a very random post by\n a very random guuuuuuuuy....");
-        p.setAuthor(u);
-        p.setDate(new Date());
-        p.setLikes(71);
-        p.setDislikes(4);
-        postsList.add(p);
-        Post p2 = new Post();
-        User u2 = new User();
-        u2.setUsername("tarmiricmi123");
-        p2.setId(2);
-        p2.setTitle("Just Some Random Post 2");
-        p2.setContent("Just some random content  2  on a very random post 2222222 by\n a very random guuuuuuuuy  2....");
-        p2.setAuthor(u2);
-        p2.setDate(new Date("2018/05/05"));
-        p2.setLikes(10);
-        p2.setDislikes(0);
-        postsList.add(p2);
-
-        sortPosts(postsList);
-
-        postsAdapter = new PostsAdapter(this, postsList);
-
-        postsListView.setAdapter(postsAdapter);
-
-        postsListView.setOnItemClickListener(new PostsItemClickListener());
-
-
-        Toast.makeText(this, PreferenceManager.getDefaultSharedPreferences(this).getString("posts_preference", ""), Toast.LENGTH_LONG).show();
-
     }
 
     public void btnStartCreatePostActivity(View view) {
@@ -223,6 +183,7 @@ public class PostsActivity extends AppCompatActivity {
         menuInflater.inflate(R.menu.posts_menu, menu);
         return true;
     }
+
 
     //Metoda koja se poziva kada kliknemo na neku od stavki naseg menija
     @Override
@@ -272,15 +233,35 @@ public class PostsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        sortPosts(postsList);
+//        sortPosts(postsList);
 
-        Toast.makeText(this, PreferenceManager.getDefaultSharedPreferences(this).getString("posts_preference", ""),Toast.LENGTH_LONG).show();
+        //U sledecim linijama instanciram postsListView, listu objekata, adapter, postavljam adapter i eventualno postavljam slusac dogadjaja za klik na stavku
+        postsListView = (ListView) findViewById(R.id.posts_list_view);
 
-        postsAdapter = new PostsAdapter(this, postsList);
-        postsListView.setAdapter(postsAdapter);
+        PostService postService = Util.retrofit.create(PostService.class);
+        final Call<List<Post>> call = postService.doGetPosts();
+        call.enqueue(new Callback<List<Post>>() {
+            @Override
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response)
+            {
+                postsList = response.body();
+//                sortPosts(postsList);
+
+                postsAdapter = new PostsAdapter(PostsActivity.this, postsList);
+
+                postsListView.setAdapter(postsAdapter);
+
+                postsListView.setOnItemClickListener(new PostsItemClickListener());
+            }
+
+            @Override
+            public void onFailure(Call<List<Post>> call, Throwable t)
+            {
+                Toast.makeText(PostsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -295,5 +276,4 @@ public class PostsActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
 }

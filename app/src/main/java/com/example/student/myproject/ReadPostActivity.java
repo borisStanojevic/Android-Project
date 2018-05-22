@@ -1,5 +1,6 @@
 package com.example.student.myproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
@@ -22,9 +23,15 @@ import com.example.student.myproject.model.Comment;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.Tag;
 import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.Util;
 
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ReadPostActivity extends AppCompatActivity {
 
@@ -32,7 +39,7 @@ public class ReadPostActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
-
+    private Post post;
     //Ovdje stade Rile Veliki
     private ListView commentsList;
     private List<Comment> comments;
@@ -102,7 +109,6 @@ public class ReadPostActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         int postId = i.getIntExtra("postId", -1);
-        Post post = null;
         for(Post p : PostsActivity.postsList)
         {
             if(p.getId() == postId)
@@ -122,6 +128,12 @@ public class ReadPostActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.read_post_menu, menu);
+
+        MenuItem deleteItem = menu.findItem(R.id.action_delete);
+        if(getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null) != null
+                && !(getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null).equals(post.getAuthor().getUsername())))
+            deleteItem.setVisible(false);
+
         return true;
     }
 
@@ -134,8 +146,22 @@ public class ReadPostActivity extends AppCompatActivity {
         }
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
-            case R.id.action_search:
-                Toast.makeText(this, "You just clicked Search action item", Toast.LENGTH_SHORT).show();
+            case R.id.action_delete:
+                PostService postService = Util.retrofit.create(PostService.class);
+                final Call<Void> call = postService.doDeletePost(post.getId());
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response)
+                    {
+                        Intent intent = new Intent(ReadPostActivity.this, PostsActivity.class);
+                        startActivity(intent);
+                    }
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t)
+                    {
+                        Toast.makeText(ReadPostActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
                 break;
             case R.id.action_settings:
                 Toast.makeText(this, "You just clicked Settings action item", Toast.LENGTH_SHORT).show();

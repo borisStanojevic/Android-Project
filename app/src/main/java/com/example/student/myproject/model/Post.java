@@ -11,6 +11,7 @@ import com.example.student.myproject.ReadPostActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,12 +22,12 @@ public class Post {
     private int id;
     private String title;
     private String content;
-    private Bitmap photo;
     private User author;
-    private Date date;
+    private Bitmap photo;
+    private String date;
     private Location location;
     private List<Tag> tags;
-    private List<Comment> comments;
+    private transient List<Comment> comments;
     private int likes;
     private int dislikes;
 
@@ -35,6 +36,7 @@ public class Post {
         comments = new ArrayList<Comment>();
     }
 
+/*
     //Konstruktor kojim ce se od JSON-a koji ce dolaziti sa servera konstruisati Post objekat
     //Trebam doraditi ovaj konstruktor trenutno cu ga koristiti samo za PostsActivity
     public Post(JSONObject json)
@@ -73,6 +75,7 @@ public class Post {
         }
         return posts;
     }
+*/
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
@@ -119,11 +122,11 @@ public class Post {
         this.author = author;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -159,6 +162,14 @@ public class Post {
         this.dislikes = dislikes;
     }
 
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
     public void showInLayout(ReadPostActivity activity) {
         TextView tvTitle = (TextView) activity.findViewById(R.id.tv_post_title);
         tvTitle.setText(this.title);
@@ -167,14 +178,15 @@ public class Post {
         TextView tvPostAuthor = (TextView) activity.findViewById(R.id.tv_post_author);
         tvPostAuthor.setText(this.author.getUsername());
         TextView tvDatePosted = (TextView) activity.findViewById(R.id.tv_date_posted);
-        tvDatePosted.setText(new SimpleDateFormat("yyyy/MM/dd").format(this.date));
+        tvDatePosted.setText(this.getDate());
         TextView tvLocationPosted = (TextView) activity.findViewById(R.id.tv_location_posted);
-        tvLocationPosted.setText("Daaaaleko daaaleko");
+        tvLocationPosted.setText("Test");
         TextView tvTags = (TextView) activity.findViewById(R.id.tv_post_tags);
-        for(Tag tag : this.tags)
-        {
+        for (Tag tag : this.tags) {
             tvTags.append(tag.getName() + " ,");
         }
+        if(tvTags.getText() != null && !"".equals(tvTags.getText()))
+            tvTags.setText(tvTags.getText().subSequence(0,tvTags.length() - 1));
     }
 
 

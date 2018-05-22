@@ -7,17 +7,14 @@ import java.util.Date;
 public class Comment {
 
     private int id;
-    private String title;
-    private String description;
+    private String content;
     private User author;
     private Date date;
     private Post post;
     private int likes;
     private int dislikes;
-    private WifiConfiguration.Status status;
 
-    public Comment()
-    {
+    public Comment() {
 
     }
 
@@ -29,20 +26,12 @@ public class Comment {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getContent() {
+        return content;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public User getAuthor() {
@@ -85,11 +74,4 @@ public class Comment {
         this.dislikes = dislikes;
     }
 
-    public WifiConfiguration.Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(WifiConfiguration.Status status) {
-        this.status = status;
-    }
 }

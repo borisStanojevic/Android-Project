@@ -28,7 +28,13 @@
             tools:context="com.example.student.myproject.CreatePostActivity">
 
             <EditText
-                android:id="@+id/et_post_description"
+                android:id="@+id/et_post_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Title"
+                />
+            <EditText
+                android:id="@+id/et_post_content"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:hint="@string/create_post_hint"

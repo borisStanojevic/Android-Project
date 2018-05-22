@@ -1,23 +1,17 @@
 package com.example.student.myproject;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.student.myproject.util.UserTestService;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Logger;
+import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.UserService;
+import com.example.student.myproject.util.Util;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,54 +26,42 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void doLogin(View view) {
-        //Omoguciti da se iz ove aktivnosti startuje PostsActivity
 
-        UserTestService userTestService = UserTestService.retrofit.create(UserTestService.class);
-        final Call<JsonObject> call =
-                userTestService.doGetUsers();
+        String username = ((TextView)findViewById(R.id.txt_username)).getText().toString();
+        final String password = ((TextView)findViewById(R.id.txt_password)).getText().toString();
 
-        call.enqueue(new Callback<JsonObject>() {
+        UserService userService = Util.retrofit.create(UserService.class);
+        final Call<User> call =
+                userService.doGetById(username);
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                String result = response.body().toString();
-
-                JsonObject jsonObject = response.body();
-
-                JsonArray usersJsonArray = jsonObject.get("users").getAsJsonArray();
-
-                EditText editTextUsername = (EditText) findViewById(R.id.txt_username);
-                EditText editTextPassword = (EditText) findViewById(R.id.txt_password);
-
-                String usernameForValidation = editTextUsername.getText().toString();
-                String passwordForValidation = editTextPassword.getText().toString();
-
-                String userFound = "Not Found";
-
-                for (JsonElement jsonElement : usersJsonArray) {
-                    JsonObject user = jsonElement.getAsJsonObject();
-                    String username = user.get("username").getAsString();
-                    String password = user.get("password").getAsString();
-
-                    if (username.equals(usernameForValidation) && password.equals(passwordForValidation)) {
-                        userFound = "User Found";
-
-                        Toast.makeText(LoginActivity.this, userFound, Toast.LENGTH_LONG).show();
-
-                        Intent intent = new Intent(LoginActivity.this, PostsActivity.class);
-                        startActivity(intent);
-
-                        finish();
-                        break;
-                    }
+            public void onResponse(Call<User> call, Response<User> response)
+            {
+                User user = response.body();
+                if(user == null)
+                {
+                    Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            }
+                if(!user.getPassword().equals(password))
+                {
+                    Toast.makeText(LoginActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("loggedInUserUsername", user.getUsername());
+                editor.commit();
 
+                Intent intent = new Intent(LoginActivity.this, PostsActivity.class);
+                startActivity(intent);
+                finish();
+            }
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                String result = t.getMessage();
-                Toast.makeText(LoginActivity.this, result, Toast.LENGTH_LONG).show();
+            public void onFailure(Call<User> call, Throwable t)
+            {
+                Toast.makeText(LoginActivity.this, "No response from server", Toast.LENGTH_SHORT).show();
             }
-
         });
     }
 
