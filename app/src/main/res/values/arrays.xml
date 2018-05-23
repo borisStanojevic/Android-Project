@@ -18,5 +18,6 @@
         <item>Create Post</item>
         <item>All Posts</item>
         <item>Settings</item>
+        <item>Log Out</item>
     </string-array>
 </resources>

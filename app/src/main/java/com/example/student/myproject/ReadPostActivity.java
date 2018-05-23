@@ -2,7 +2,10 @@ package com.example.student.myproject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.adapters.CommentsAdapter;
@@ -26,6 +30,7 @@ import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
 import com.example.student.myproject.util.Util;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +49,6 @@ public class ReadPostActivity extends AppCompatActivity {
     private ListView commentsList;
     private List<Comment> comments;
     private CommentsAdapter commentsAdapter;
-
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
@@ -56,7 +60,28 @@ public class ReadPostActivity extends AppCompatActivity {
         }
 
         private void selectItem(int position) {
-            Toast.makeText(ReadPostActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
+            switch (position)
+            {
+                case 0:
+                    startActivity(new Intent(ReadPostActivity.this, CreatePostActivity.class));
+                    break;
+                case 1:
+                    startActivity(new Intent(ReadPostActivity.this, PostsActivity.class));
+                    break;
+                case 2:
+                    startActivity(new Intent(ReadPostActivity.this, SettingsActivity.class));
+                    break;
+                case 3:
+                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("loggedInUserUsername", null);
+                    editor.apply();
+                    startActivity(new Intent(ReadPostActivity.this, LoginActivity.class));
+                    finish();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -107,6 +132,7 @@ public class ReadPostActivity extends AppCompatActivity {
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
+
         Intent i = getIntent();
         int postId = i.getIntExtra("postId", -1);
         for(Post p : PostsActivity.postsList)
@@ -117,8 +143,6 @@ public class ReadPostActivity extends AppCompatActivity {
                 break;
             }
         }
-        if(post == null)
-            post = new Post();
 
         post.showInLayout(this);
     }

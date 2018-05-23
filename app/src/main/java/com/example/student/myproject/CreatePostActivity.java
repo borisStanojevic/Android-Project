@@ -3,15 +3,19 @@ package com.example.student.myproject;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +32,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.adapters.PostsAdapter;
@@ -38,6 +43,7 @@ import com.example.student.myproject.util.PostService;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -53,7 +59,6 @@ public class CreatePostActivity extends AppCompatActivity {
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
     private String loggedInUserUsername;
-
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -62,9 +67,36 @@ public class CreatePostActivity extends AppCompatActivity {
         }
 
         private void selectItem(int position) {
-            Toast.makeText(CreatePostActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
+            switch (position)
+            {
+                case 0:
+                    startActivity(new Intent(CreatePostActivity.this, CreatePostActivity.class));
+                    break;
+                case 1:
+                    startActivity(new Intent(CreatePostActivity.this, PostsActivity.class));
+
+                    break;
+                case 2:
+                    startActivity(new Intent(CreatePostActivity.this, SettingsActivity.class));
+                    break;
+                case 3:
+                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("loggedInUserUsername", null);
+                    editor.apply();
+                    startActivity(new Intent(CreatePostActivity.this, LoginActivity.class));
+                    finish();
+                    break;
+                default:
+                    break;
+            }
         }
     }
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private static final String locationProvider = LocationManager.NETWORK_PROVIDER;
+    private Geocoder geocoder;
+    private Post post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +145,35 @@ public class CreatePostActivity extends AppCompatActivity {
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
+        post = new Post();
+
         loggedInUserUsername = getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null);
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                post.setLocationLatitude(location.getLatitude());
+                post.setLocationLongitude(location.getLongitude());
+                post.setLocation(location);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        geocoder = new Geocoder(this);
 
     }
 
@@ -135,6 +195,22 @@ public class CreatePostActivity extends AppCompatActivity {
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
             case R.id.action_do_post:
+                //Pokusavam da dobavim lokaciju
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        )
+                {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 99);
+                }
+                else
+                {
+                    locationManager.requestSingleUpdate(locationProvider, locationListener, null);
+                    Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+                    post.setLocation(lastKnownLocation);
+                    post.setLocationLatitude(lastKnownLocation.getLatitude());
+                    post.setLocationLongitude(lastKnownLocation.getLongitude());
+                }
+
+                //Uzimam naslov, sadrzaj, tagove
                 String title = ((EditText)findViewById(R.id.et_post_title)).getText().toString();
                 String content = ((EditText)findViewById(R.id.et_post_content)).getText().toString();
                 String tags = ((EditText)findViewById(R.id.et_post_tags)).getText().toString();
@@ -148,7 +224,6 @@ public class CreatePostActivity extends AppCompatActivity {
                     tagsTokens = new String[0];
                 }
 
-                Post post = new Post();
                 post.setTitle(title);
                 post.setContent(content);
                 User author = new User();
@@ -190,6 +265,27 @@ public class CreatePostActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 99: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        locationManager.requestSingleUpdate(locationProvider, locationListener, null);                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+                        post.setLocation(lastKnownLocation);
+                    } catch (SecurityException exc) {
+                        post.setLocation(null);
+                    }
+                } else { post.setLocation(null);}
+
+                return;
+            }
+
+        }
     }
 
     //Metoda koja govori drawer toggle indikatoru da prikaze razlicitu ikonicu u zavisnosti da li je drawer prevucen ili 'svucen', sinhronizacija

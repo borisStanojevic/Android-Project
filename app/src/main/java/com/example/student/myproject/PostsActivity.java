@@ -57,7 +57,29 @@ public class PostsActivity extends AppCompatActivity {
         }
 
         private void selectItem(int position) {
-            Toast.makeText(PostsActivity.this, "Clicked Drawer List Item", Toast.LENGTH_SHORT).show();
+            switch (position)
+            {
+                case 0:
+                    startActivity(new Intent(PostsActivity.this, CreatePostActivity.class));
+                    break;
+                case 1:
+                    startActivity(new Intent(PostsActivity.this, PostsActivity.class));
+
+                    break;
+                case 2:
+                    startActivity(new Intent(PostsActivity.this, SettingsActivity.class));
+                    break;
+                case 3:
+                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("loggedInUserUsername", null);
+                    editor.apply();
+                    startActivity(new Intent(PostsActivity.this, LoginActivity.class));
+                    finish();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -159,21 +181,6 @@ public class PostsActivity extends AppCompatActivity {
         drawerList.setAdapter(stringArrayAdapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-    }
-
-    public void btnStartCreatePostActivity(View view) {
-        Intent i = new Intent(this, CreatePostActivity.class);
-        startActivity(i);
-    }
-
-    public void btnStartReadPostActivity(View view) {
-        Intent i = new Intent(this, ReadPostActivity.class);
-        startActivity(i);
-    }
-
-    public void btnStartSettingsActivity(View view) {
-        Intent i = new Intent(this, TestActivity.class);
-        startActivity(i);
     }
 
     //Dodavam svoj meni na toolbar

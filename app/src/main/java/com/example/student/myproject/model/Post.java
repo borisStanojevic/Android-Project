@@ -1,6 +1,8 @@
 package com.example.student.myproject.model;
 
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +28,9 @@ public class Post {
     private User author;
     private Bitmap photo;
     private String date;
-    private Location location;
+    private double locationLatitude;
+    private double locationLongitude;
+    private transient Location location;
     private List<Tag> tags;
     private transient List<Comment> comments;
     private int likes;
@@ -76,6 +81,10 @@ public class Post {
         return posts;
     }
 */
+
+    public Location getLocation() {
+        return this.location;
+    }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
@@ -130,8 +139,20 @@ public class Post {
         this.date = date;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLocationLatitude() {
+        return locationLatitude;
+    }
+
+    public void setLocationLatitude(double locationLatitude) {
+        this.locationLatitude = locationLatitude;
+    }
+
+    public double getLocationLongitude() {
+        return locationLongitude;
+    }
+
+    public void setLocationLongitude(double locationLongitude) {
+        this.locationLongitude = locationLongitude;
     }
 
     public void setLocation(Location location) {
@@ -179,15 +200,24 @@ public class Post {
         tvPostAuthor.setText(this.author.getUsername());
         TextView tvDatePosted = (TextView) activity.findViewById(R.id.tv_date_posted);
         tvDatePosted.setText(this.getDate());
-        TextView tvLocationPosted = (TextView) activity.findViewById(R.id.tv_location_posted);
-        tvLocationPosted.setText("Test");
         TextView tvTags = (TextView) activity.findViewById(R.id.tv_post_tags);
-        for (Tag tag : this.tags) {
-            tvTags.append(tag.getName() + " ,");
+        Geocoder geocoder = new Geocoder(activity);
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(this.getLocationLatitude(), this.getLocationLongitude(), 1);
+            String locality = addresses.get(0).getLocality();
+            String countryName = addresses.get(0).getCountryName();
+            ((TextView) activity.findViewById(R.id.tv_location_posted)).setText("Near " + locality + " , " + countryName);
+        } catch (IOException exc) {
+            exc.printStackTrace();
+        } catch (IndexOutOfBoundsException exc) {
+            ((TextView) activity.findViewById(R.id.tv_location_posted)).setText("Unknown");
+            for (Tag tag : this.tags) {
+                tvTags.append(tag.getName() + " ,");
+            }
+            if (tvTags.getText() != null && !"".equals(tvTags.getText()))
+                tvTags.setText(tvTags.getText().subSequence(0, tvTags.length() - 1));
         }
-        if(tvTags.getText() != null && !"".equals(tvTags.getText()))
-            tvTags.setText(tvTags.getText().subSequence(0,tvTags.length() - 1));
     }
-
 
 }
