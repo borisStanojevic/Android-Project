@@ -1,12 +1,17 @@
 package com.example.student.myproject;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.location.Address;
-import android.location.Geocoder;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,19 +24,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.adapters.CommentsAdapter;
+import com.example.student.myproject.fragments.CommentsFragment;
+import com.example.student.myproject.fragments.PostFragment;
 import com.example.student.myproject.model.Comment;
 import com.example.student.myproject.model.Post;
-import com.example.student.myproject.model.Tag;
-import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.CommentService;
 import com.example.student.myproject.util.PostService;
 import com.example.student.myproject.util.Util;
 
-import java.io.IOException;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,13 +48,46 @@ public class ReadPostActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
-    private Post post;
-    //Ovdje stade Rile Veliki
-    private ListView commentsList;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private class ViewPagerAdapter extends FragmentPagerAdapter{
+        private final List<Fragment> fragmentList = new ArrayList<>();
+        private final List<String> fragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager){
+            super(manager);
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            return fragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title)
+        {
+            fragmentList.add(fragment);
+            fragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position)
+        {
+            return fragmentTitleList.get(position);
+        }
+
+    }
+    private PostFragment postFragment;
+    private ListView commentsListView;
     private List<Comment> comments;
     private CommentsAdapter commentsAdapter;
     private String[] drawerListItems;
     private ArrayAdapter<String> stringArrayAdapter;
+
     //Objekat ove klase predstavlja slusac dogadjaja klika na jednu od stavki ListViewa koji se nalazi u draweru
     private class DrawerItemClickListener implements ListView.OnItemClickListener
     {
@@ -72,12 +109,28 @@ public class ReadPostActivity extends AppCompatActivity {
                     startActivity(new Intent(ReadPostActivity.this, SettingsActivity.class));
                     break;
                 case 3:
-                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("loggedInUserUsername", null);
-                    editor.apply();
-                    startActivity(new Intent(ReadPostActivity.this, LoginActivity.class));
-                    finish();
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("loggedInUserUsername", null);
+                                    editor.apply();
+                                    startActivity(new Intent(ReadPostActivity.this, LoginActivity.class));
+                                    finish();
+                                    return;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    dialog.dismiss();
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ReadPostActivity.this);
+                    builder.setMessage("Are you sure you want to log out?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
                     break;
                 default:
                     break;
@@ -133,18 +186,27 @@ public class ReadPostActivity extends AppCompatActivity {
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
-        Intent i = getIntent();
-        int postId = i.getIntExtra("postId", -1);
-        for(Post p : PostsActivity.postsList)
-        {
-            if(p.getId() == postId)
-            {
-                post = p;
-                break;
-            }
-        }
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter((getSupportFragmentManager()));
+        viewPager.setAdapter(viewPagerAdapter);
 
-        post.showInLayout(this);
+        tabLayout = (TabLayout)findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+        Intent i = getIntent();
+        int postId = i.getIntExtra("id", -1);
+        PostFragment postFragment = new PostFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", postId);
+        postFragment.setArguments(bundle);
+        CommentsFragment commentsFragment = new CommentsFragment();
+        bundle = new Bundle();
+        bundle.putInt("postId", postId);
+        commentsFragment.setArguments(bundle);
+        viewPagerAdapter.addFragment(postFragment, "Post");
+        viewPagerAdapter.addFragment(commentsFragment, "Comments");
+        viewPagerAdapter.notifyDataSetChanged();
+
     }
 
     //Dodavam svoj meni na toolbar
@@ -152,12 +214,7 @@ public class ReadPostActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.read_post_menu, menu);
-
-        MenuItem deleteItem = menu.findItem(R.id.action_delete);
-        if(getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null) != null
-                && !(getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null).equals(post.getAuthor().getUsername())))
-            deleteItem.setVisible(false);
-
+        
         return true;
     }
 
@@ -171,25 +228,9 @@ public class ReadPostActivity extends AppCompatActivity {
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
             case R.id.action_delete:
-                PostService postService = Util.retrofit.create(PostService.class);
-                final Call<Void> call = postService.doDeletePost(post.getId());
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response)
-                    {
-                        Intent intent = new Intent(ReadPostActivity.this, PostsActivity.class);
-                        startActivity(intent);
-                    }
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t)
-                    {
-                        Toast.makeText(ReadPostActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-                break;
+                return false;
             case R.id.action_settings:
-                Toast.makeText(this, "You just clicked Settings action item", Toast.LENGTH_SHORT).show();
-                break;
+                return  false;
             default:
                 break;
         }
@@ -221,8 +262,25 @@ public class ReadPostActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
+//        CommentService commentService = Util.retrofit.create(CommentService.class);
+//        final Call<List<Comment>> call = commentService.getAll(post.getId());
+//        call.enqueue(new Callback<List<Comment>>() {
+//            @Override
+//            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response)
+//            {
+//                comments = response.body();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Comment>> call, Throwable t)
+//            {
+//
+//            }
+//        });
+
     }
 
     @Override

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <TextView
         android:id="@+id/tv_comment_id"
@@ -37,20 +39,21 @@
         android:layout_below="@id/tv_comment_content"
         android:layout_toRightOf="@id/tv_comment_likes" />
 
-    <Button
+    <ImageButton
         android:id="@+id/btn_like_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_comment_likes"
-        android:text="@string/like" />
+        app:srcCompat="@drawable/baseline_thumb_up_alt_24" />
 
-    <Button
+    <ImageButton
         android:id="@+id/btn_dislike_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_comment_dislikes"
         android:layout_toRightOf="@id/btn_like_comment"
-        android:text="@string/dislike" />
+        app:srcCompat="@drawable/baseline_thumb_down_alt_24" />
+
 
 
 </RelativeLayout>

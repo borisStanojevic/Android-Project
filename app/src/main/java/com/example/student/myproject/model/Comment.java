@@ -9,8 +9,8 @@ public class Comment {
     private int id;
     private String content;
     private User author;
-    private Date date;
-    private Post post;
+    private String date;
+    private transient Post post;
     private int likes;
     private int dislikes;
 
@@ -42,11 +42,11 @@ public class Comment {
         this.author = author;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

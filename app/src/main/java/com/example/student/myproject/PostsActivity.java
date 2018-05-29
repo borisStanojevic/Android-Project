@@ -1,6 +1,8 @@
 package com.example.student.myproject;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -43,7 +45,7 @@ public class PostsActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private ListView postsListView;
-    public static List<Post> postsList;
+    public  List<Post> postsList;
     private PostsAdapter postsAdapter;
     private ListView drawerList;
     private String[] drawerListItems;
@@ -70,12 +72,28 @@ public class PostsActivity extends AppCompatActivity {
                     startActivity(new Intent(PostsActivity.this, SettingsActivity.class));
                     break;
                 case 3:
-                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("loggedInUserUsername", null);
-                    editor.apply();
-                    startActivity(new Intent(PostsActivity.this, LoginActivity.class));
-                    finish();
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("loggedInUserUsername", null);
+                                    editor.apply();
+                                    startActivity(new Intent(PostsActivity.this, LoginActivity.class));
+                                    finish();
+                                    return;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    dialog.dismiss();
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(PostsActivity.this);
+                    builder.setMessage("Are you sure you want to log out?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
                     break;
                 default:
                     break;
@@ -88,7 +106,7 @@ public class PostsActivity extends AppCompatActivity {
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             int postId = postsList.get(position).getId();
             Intent intent = new Intent(PostsActivity.this, ReadPostActivity.class);
-            intent.putExtra("postId", postId);
+            intent.putExtra("id", postId);
             startActivity(intent);
         }
     }
@@ -240,7 +258,6 @@ public class PostsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        sortPosts(postsList);
 
         //U sledecim linijama instanciram postsListView, listu objekata, adapter, postavljam adapter i eventualno postavljam slusac dogadjaja za klik na stavku
         postsListView = (ListView) findViewById(R.id.posts_list_view);
@@ -252,7 +269,6 @@ public class PostsActivity extends AppCompatActivity {
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response)
             {
                 postsList = response.body();
-//                sortPosts(postsList);
 
                 postsAdapter = new PostsAdapter(PostsActivity.this, postsList);
 

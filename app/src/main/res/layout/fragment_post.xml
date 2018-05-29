@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="20dp"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/tv_post_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/tv_post_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_post_title"
+        android:layout_marginBottom="5dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/tv_post_content"
+        android:background="#000000" />
+
+    <TextView
+        android:id="@+id/tv_post_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/divider" />
+
+    <TextView
+        android:id="@+id/tv_date_posted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/divider" />
+
+    <TextView
+        android:id="@+id/tv_location_posted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tv_date_posted" />
+
+    <TextView
+        android:id="@+id/tv_post_tags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tv_location_posted"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/tv_post_likes"
+        android:layout_below="@id/tv_post_tags"
+        android:layout_alignParentLeft="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_post_dislikes"
+        android:layout_below="@id/tv_post_tags"
+        android:layout_toRightOf="@id/tv_post_likes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageButton
+        android:id="@+id/btn_like_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        app:srcCompat="@drawable/baseline_thumb_up_alt_24"
+        android:layout_below="@id/tv_post_likes"
+        android:text="@string/like" />
+
+    <ImageButton
+        android:id="@+id/btn_dislike_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/baseline_thumb_down_alt_24"
+        android:layout_below="@id/tv_post_likes"
+        android:layout_toRightOf="@id/btn_like_post"
+        android:text="@string/dislike" />
+
+</RelativeLayout>

@@ -4,6 +4,7 @@
     <item
         android:id="@+id/action_create_post"
         android:title="Post Something"
+        android:icon="@drawable/baseline_create_24"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_settings"

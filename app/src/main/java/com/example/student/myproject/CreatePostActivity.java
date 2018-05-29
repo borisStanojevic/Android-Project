@@ -1,7 +1,9 @@
 package com.example.student.myproject;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -80,12 +82,28 @@ public class CreatePostActivity extends AppCompatActivity {
                     startActivity(new Intent(CreatePostActivity.this, SettingsActivity.class));
                     break;
                 case 3:
-                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("loggedInUserUsername", null);
-                    editor.apply();
-                    startActivity(new Intent(CreatePostActivity.this, LoginActivity.class));
-                    finish();
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("loggedInUserUsername", null);
+                                    editor.apply();
+                                    startActivity(new Intent(CreatePostActivity.this, LoginActivity.class));
+                                    finish();
+                                    return;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    dialog.dismiss();
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CreatePostActivity.this);
+                    builder.setMessage("Are you sure you want to log out?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
                     break;
                 default:
                     break;
@@ -196,8 +214,7 @@ public class CreatePostActivity extends AppCompatActivity {
         switch (itemClickedId) {
             case R.id.action_do_post:
                 //Pokusavam da dobavim lokaciju
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        )
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 99);
                 }
@@ -329,6 +346,8 @@ public class CreatePostActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
+        locationManager.removeUpdates(locationListener);
     }
 }

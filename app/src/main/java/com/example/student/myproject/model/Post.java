@@ -41,47 +41,6 @@ public class Post {
         comments = new ArrayList<Comment>();
     }
 
-/*
-    //Konstruktor kojim ce se od JSON-a koji ce dolaziti sa servera konstruisati Post objekat
-    //Trebam doraditi ovaj konstruktor trenutno cu ga koristiti samo za PostsActivity
-    public Post(JSONObject json)
-    {
-        try
-        {
-            this.id = json.getInt("id");
-            this.title = json.getString("title");
-            this.content = json.getString("content");
-            this.author = new User();
-            this.author.setUsername(json.getString("authorUsername"));
-            this.likes = json.getInt("likes");
-            this.dislikes = json.getInt("dislikes");
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-
-    //Metoda koja vraca Java listu objekata Post za dobijeni JSON niz
-    public static List<Post> getPostsFromJSON(JSONArray jsonArray)
-    {
-        ArrayList<Post> posts = new ArrayList<>();
-        for (int i = 0 ; i < jsonArray.length() ; i++)
-        {
-            try
-            {
-                posts.add(new Post(jsonArray.getJSONObject(i)));
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return posts;
-    }
-*/
-
     public Location getLocation() {
         return this.location;
     }
@@ -191,33 +150,5 @@ public class Post {
         this.comments = comments;
     }
 
-    public void showInLayout(ReadPostActivity activity) {
-        TextView tvTitle = (TextView) activity.findViewById(R.id.tv_post_title);
-        tvTitle.setText(this.title);
-        TextView tvContent = (TextView) activity.findViewById(R.id.tv_post_content);
-        tvContent.setText(this.content);
-        TextView tvPostAuthor = (TextView) activity.findViewById(R.id.tv_post_author);
-        tvPostAuthor.setText(this.author.getUsername());
-        TextView tvDatePosted = (TextView) activity.findViewById(R.id.tv_date_posted);
-        tvDatePosted.setText(this.getDate());
-        TextView tvTags = (TextView) activity.findViewById(R.id.tv_post_tags);
-        Geocoder geocoder = new Geocoder(activity);
-        List<Address> addresses = null;
-        try {
-            addresses = geocoder.getFromLocation(this.getLocationLatitude(), this.getLocationLongitude(), 1);
-            String locality = addresses.get(0).getLocality();
-            String countryName = addresses.get(0).getCountryName();
-            ((TextView) activity.findViewById(R.id.tv_location_posted)).setText("Near " + locality + " , " + countryName);
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        } catch (IndexOutOfBoundsException exc) {
-            ((TextView) activity.findViewById(R.id.tv_location_posted)).setText("Unknown");
-            for (Tag tag : this.tags) {
-                tvTags.append(tag.getName() + " ,");
-            }
-            if (tvTags.getText() != null && !"".equals(tvTags.getText()))
-                tvTags.setText(tvTags.getText().subSequence(0, tvTags.length() - 1));
-        }
-    }
 
 }
