@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".UsersActivity">
+
+    <include layout="@layout/app_bar" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/users_drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2.5dp"
+        android:layout_marginRight="2.5dp"
+        android:paddingTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2.5dp"
+            android:layout_marginRight="2.5dp"
+            android:orientation="vertical"
+            android:paddingTop="15dp">
+
+            <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/users_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/holo_blue_dark"
+                android:dividerHeight="1.5dp">
+            </ListView>
+
+        </LinearLayout>
+
+        <include layout="@layout/navigation_view"/>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>

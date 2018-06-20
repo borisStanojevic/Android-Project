@@ -9,22 +9,26 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface PostService {
 
     @GET("posts/{id}")
-    Call<Post> doGetPostById(@Path("id") int id);
+    Call<Post> getById(@Path("id") int id);
 
     @GET("posts")
-    Call<List<Post>> doGetPosts();
+    Call<List<Post>> getAll();
 
     @POST("posts")
-    Call<Post> doCreatePost(@Body Post post);
+    Call<Post> create(@Body Post post);
+
+    @PUT("posts")
+    Call<Post> update(@Body Post post);
 
     @DELETE("posts/{id}")
-    Call<Void> doDeletePost(@Path("id") int id);
+    Call<Void> delete(@Path("id") int id);
 
 
 }

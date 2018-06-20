@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
         UserService userService = Util.retrofit.create(UserService.class);
         final Call<User> call =
-                userService.doGetById(username);
+                userService.getByUsername(username);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response)
@@ -96,4 +96,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    public void goToRegistration(View view) {
+        startActivity(new Intent(this, RegistrationActivity.class));
+    }
 }

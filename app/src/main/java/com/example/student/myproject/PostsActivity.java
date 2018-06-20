@@ -66,12 +66,14 @@ public class PostsActivity extends AppCompatActivity {
                     break;
                 case 1:
                     startActivity(new Intent(PostsActivity.this, PostsActivity.class));
-
                     break;
                 case 2:
-                    startActivity(new Intent(PostsActivity.this, SettingsActivity.class));
+                    startActivity(new Intent(PostsActivity.this, UsersActivity.class));
                     break;
                 case 3:
+                    startActivity(new Intent(PostsActivity.this, SettingsActivity.class));
+                    break;
+                case 4:
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -263,7 +265,7 @@ public class PostsActivity extends AppCompatActivity {
         postsListView = (ListView) findViewById(R.id.posts_list_view);
 
         PostService postService = Util.retrofit.create(PostService.class);
-        final Call<List<Post>> call = postService.doGetPosts();
+        final Call<List<Post>> call = postService.getAll();
         call.enqueue(new Callback<List<Post>>() {
             @Override
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response)

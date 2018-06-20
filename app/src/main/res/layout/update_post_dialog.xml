@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="240dp"
+        android:padding="10dp"
+        >
+
+        <TextView
+            android:id="@+id/dialog_update_post_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7.5dp"
+            android:text="Post" />
+
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dialog_update_post_heading" />
+
+        <EditText
+            android:id="@+id/et_content"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_below="@id/et_title"
+            android:inputType="text|textMultiLine" />
+
+        <TextView
+            android:id="@+id/action_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:text="Update" />
+
+        <TextView
+            android:id="@+id/action_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="20dp"
+            android:text="Cancel" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -15,18 +15,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Post {
+public class Post implements Serializable {
 
     private int id;
     private String title;
     private String content;
     private User author;
-    private Bitmap photo;
+    private String photo;
     private String date;
     private double locationLatitude;
     private double locationLongitude;
@@ -74,11 +75,11 @@ public class Post {
         this.content = content;
     }
 
-    public Bitmap getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Bitmap photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 

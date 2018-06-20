@@ -9,7 +9,7 @@ import java.util.List;
 public class User implements Serializable {
 
     private String fullName;
-    private Bitmap photo;
+    private String photo;
     private String username;
     private String password;
     private String email;
@@ -22,12 +22,18 @@ public class User implements Serializable {
         comments = new ArrayList<Comment>();
     }
 
+    public User(String fullName, String username, String password, String email) {
+        this.fullName = fullName;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
-    public Bitmap getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Bitmap photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 

@@ -257,7 +257,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 }
 
                 PostService postService = Util.retrofit.create(PostService.class);
-                final Call<Post> call = postService.doCreatePost(post);
+                final Call<Post> call = postService.create(post);
                 call.enqueue(new Callback<Post>() {
                     @Override
                     public void onResponse(Call<Post> call, Response<Post> response)
@@ -292,7 +292,8 @@ public class CreatePostActivity extends AppCompatActivity {
             case 99: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     try {
-                        locationManager.requestSingleUpdate(locationProvider, locationListener, null);                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+                        locationManager.requestSingleUpdate(locationProvider, locationListener, null);
+                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
                         post.setLocation(lastKnownLocation);
                     } catch (SecurityException exc) {
                         post.setLocation(null);

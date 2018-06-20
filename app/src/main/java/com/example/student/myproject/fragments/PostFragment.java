@@ -1,6 +1,7 @@
 package com.example.student.myproject.fragments;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,8 @@ import com.example.student.myproject.PostsActivity;
 import com.example.student.myproject.R;
 import com.example.student.myproject.ReadPostActivity;
 import com.example.student.myproject.SettingsActivity;
+import com.example.student.myproject.dialogs.UpdatePostDialog;
+import com.example.student.myproject.dialogs.UserDialog;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.Tag;
 import com.example.student.myproject.util.PostService;
@@ -150,7 +153,7 @@ public class PostFragment extends Fragment {
 
         //Radim GET zahtjev serveru za post ciji je id 'id'
         PostService postService = Util.retrofit.create(PostService.class);
-        final Call<Post> call = postService.doGetPostById(id);
+        final Call<Post> call = postService.getById(id);
         call.enqueue(new Callback<Post>() {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response)
@@ -187,7 +190,7 @@ public class PostFragment extends Fragment {
                             switch (which){
                                 case DialogInterface.BUTTON_POSITIVE:
                                     PostService postService = Util.retrofit.create(PostService.class);
-                                    final Call<Void> call = postService.doDeletePost(post.getId());
+                                    final Call<Void> call = postService.delete(post.getId());
                                     call.enqueue(new Callback<Void>() {
                                         @Override
                                         public void onResponse(Call<Void> call, Response<Void> response) {
@@ -213,6 +216,14 @@ public class PostFragment extends Fragment {
                             .setNegativeButton("No", dialogClickListener).show();
                     break;
                 }
+            case R.id.action_update:
+                FragmentManager fragmentManager = getActivity().getFragmentManager();
+                UpdatePostDialog updatePostDialog = new UpdatePostDialog();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("post", post);
+                updatePostDialog.setArguments(bundle);
+                updatePostDialog.show(fragmentManager, "Post");
+                break;
             case R.id.action_settings:
                 Intent intent = new Intent(getActivity().getApplicationContext(), SettingsActivity.class);
                 startActivity(intent);

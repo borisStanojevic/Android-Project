@@ -186,26 +186,7 @@ public class ReadPostActivity extends AppCompatActivity {
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter((getSupportFragmentManager()));
-        viewPager.setAdapter(viewPagerAdapter);
 
-        tabLayout = (TabLayout)findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-
-        Intent i = getIntent();
-        int postId = i.getIntExtra("id", -1);
-        PostFragment postFragment = new PostFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("id", postId);
-        postFragment.setArguments(bundle);
-        CommentsFragment commentsFragment = new CommentsFragment();
-        bundle = new Bundle();
-        bundle.putInt("postId", postId);
-        commentsFragment.setArguments(bundle);
-        viewPagerAdapter.addFragment(postFragment, "Post");
-        viewPagerAdapter.addFragment(commentsFragment, "Comments");
-        viewPagerAdapter.notifyDataSetChanged();
 
     }
 
@@ -265,22 +246,26 @@ public class ReadPostActivity extends AppCompatActivity {
     protected void onResume()
     {
         super.onResume();
-//        CommentService commentService = Util.retrofit.create(CommentService.class);
-//        final Call<List<Comment>> call = commentService.getAll(post.getId());
-//        call.enqueue(new Callback<List<Comment>>() {
-//            @Override
-//            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response)
-//            {
-//                comments = response.body();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<Comment>> call, Throwable t)
-//            {
-//
-//            }
-//        });
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter((getSupportFragmentManager()));
+        viewPager.setAdapter(viewPagerAdapter);
 
+        tabLayout = (TabLayout)findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+        Intent i = getIntent();
+        int postId = i.getIntExtra("id", -1);
+        PostFragment postFragment = new PostFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", postId);
+        postFragment.setArguments(bundle);
+        CommentsFragment commentsFragment = new CommentsFragment();
+        bundle = new Bundle();
+        bundle.putInt("postId", postId);
+        commentsFragment.setArguments(bundle);
+        viewPagerAdapter.addFragment(postFragment, "Post");
+        viewPagerAdapter.addFragment(commentsFragment, "Comments");
+        viewPagerAdapter.notifyDataSetChanged();
     }
 
     @Override

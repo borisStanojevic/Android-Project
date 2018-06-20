@@ -32,4 +32,26 @@
         android:onClick="doLogin"
         />
 
+    <LinearLayout
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center">
+        <TextView
+            android:clickable="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Don't have an account ? "
+            />
+        <TextView
+            android:onClick="goToRegistration"
+            android:textColor="#0000EE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register_link"
+            />
+    </LinearLayout>
+
 </LinearLayout>

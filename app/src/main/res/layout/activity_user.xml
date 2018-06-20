@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".UserActivity">
+
+    <include layout="@layout/app_bar" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/user_drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2.5dp"
+        android:layout_marginRight="2.5dp"
+        android:paddingTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2.5dp"
+            android:layout_marginRight="2.5dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="180dp"
+                android:layout_marginBottom="15dp"
+                android:src="@drawable/default_user_photo" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/outline_camera_alt_24"
+                android:layout_marginBottom="25dp"
+                android:text="Upload" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="7.5dp"
+                android:background="@color/colorPrimary" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/lbl_full_name"
+                    android:layout_marginRight="3dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="Full Name: " />
+
+                <TextView
+                    android:id="@+id/tv_user_full_name"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/lbl_full_name" />
+
+                <TextView
+                    android:id="@+id/lbl_email"
+                    android:layout_marginRight="3.5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/lbl_full_name"
+                    android:text="Email:         " />
+
+                <TextView
+                    android:id="@+id/tv_user_email"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_user_full_name"
+                    android:layout_toRightOf="@id/lbl_email" />
+
+                <TextView
+                    android:id="@+id/lbl_username"
+                    android:layout_marginRight="3dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/lbl_email"
+                    android:text="Username: " />
+
+                <TextView
+                    android:id="@+id/tv_user_username"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_user_email"
+                    android:layout_toRightOf="@id/lbl_username" />
+
+                <TextView
+                    android:id="@+id/lbl_password"
+                    android:layout_marginRight="3dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/lbl_username"
+                    android:text="Password: " />
+
+                <TextView
+                    android:id="@+id/tv_user_password"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_user_username"
+                    android:layout_toRightOf="@id/lbl_password" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <include layout="@layout/navigation_view" />
+
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>
