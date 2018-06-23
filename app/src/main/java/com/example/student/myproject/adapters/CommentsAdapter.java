@@ -1,6 +1,9 @@
 package com.example.student.myproject.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.media.Image;
 import android.support.annotation.NonNull;
@@ -13,11 +16,20 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.student.myproject.PostsActivity;
 import com.example.student.myproject.R;
+import com.example.student.myproject.fragments.CommentsFragment;
 import com.example.student.myproject.model.Comment;
+import com.example.student.myproject.util.CommentService;
+import com.example.student.myproject.util.Util;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CommentsAdapter extends ArrayAdapter<Comment> {
 
@@ -57,6 +69,8 @@ public class CommentsAdapter extends ArrayAdapter<Comment> {
 
         final ImageButton btnLike = (ImageButton)convertView.findViewById(R.id.btn_like_comment);
         final ImageButton btnDislike = (ImageButton)convertView.findViewById(R.id.btn_dislike_comment);
+        final ImageButton btnDelete = (ImageButton) convertView.findViewById(R.id.btn_delete_comment);
+
         btnLike.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -107,6 +121,47 @@ public class CommentsAdapter extends ArrayAdapter<Comment> {
             }
         });
 
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        switch (which)
+                        {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                CommentService commentService = Util.retrofit.create(CommentService.class);
+                                final Call<Void> call = commentService.delete(-1, comment.getId());
+                                call.enqueue(new Callback<Void>() {
+                                    @Override
+                                    public void onResponse(Call<Void> call, Response<Void> response)
+                                    {
+                                        if(response.code() == 200) {
+                                            CommentsFragment.comments.remove(comment);
+                                            CommentsAdapter.this.notifyDataSetChanged();
+                                        }
+                                        Snackbar.make(parent, "Comment deleted", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                    @Override
+                                    public void onFailure(Call<Void> call, Throwable t)
+                                    {
+                                        Toast.makeText(parent.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
+                builder.setMessage("Are you sure ?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+        });
 
         return convertView;
     }

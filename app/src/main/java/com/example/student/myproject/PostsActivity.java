@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -113,43 +114,43 @@ public class PostsActivity extends AppCompatActivity {
         }
     }
 
-//    private Comparator<Post> createPostComparator(String key) {
-//        if ("date_asc".equalsIgnoreCase(key)) {
-//            return new Comparator<Post>() {
-//                @Override
-//                public int compare(Post o1, Post o2) {
-//                    return o1.getDate().compareTo(o2.getDate());
-//                }
-//            };
-//        } else if ("pop_asc".equalsIgnoreCase(key)) {
-//            return new Comparator<Post>() {
-//                @Override
-//                public int compare(Post o1, Post o2) {
-//                    return o1.getLikes() - o2.getLikes();
-//                }
-//            };
-//        } else if ("pop_desc".equalsIgnoreCase(key)) {
-//            return new Comparator<Post>() {
-//                @Override
-//                public int compare(Post o1, Post o2) {
-//                    return o2.getLikes() - o1.getLikes();
-//                }
-//            };
-//        } else {
-//            return new Comparator<Post>() {
-//                @Override
-//                public int compare(Post o1, Post o2) {
-//                    return o2.getDate().compareTo(o1.getDate());
-//                }
-//            };
-//        }
-//    }
+    private Comparator<Post> createPostComparator(String key) {
+        if ("date_asc".equalsIgnoreCase(key)) {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o1.getDate().compareTo(o2.getDate());
+                }
+            };
+        } else if ("pop_asc".equalsIgnoreCase(key)) {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o1.getLikes() - o2.getLikes();
+                }
+            };
+        } else if ("pop_desc".equalsIgnoreCase(key)) {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o2.getLikes() - o1.getLikes();
+                }
+            };
+        } else {
+            return new Comparator<Post>() {
+                @Override
+                public int compare(Post o1, Post o2) {
+                    return o2.getDate().compareTo(o1.getDate());
+                }
+            };
+        }
+    }
 
     private void sortPosts(List<Post> posts) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String postsSortingKey = sharedPreferences.getString("posts_preference", "date_desc");
-//        Comparator<Post> postComparator = createPostComparator(postsSortingKey);
-//        Collections.sort(posts, postComparator);
+        Comparator<Post> postComparator = createPostComparator(postsSortingKey);
+        Collections.sort(posts, postComparator);
     }
 
     @Override
@@ -255,6 +256,7 @@ public class PostsActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+
     }
 
     @Override
@@ -271,6 +273,8 @@ public class PostsActivity extends AppCompatActivity {
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response)
             {
                 postsList = response.body();
+
+                sortPosts(postsList);
 
                 postsAdapter = new PostsAdapter(PostsActivity.this, postsList);
 
@@ -290,6 +294,7 @@ public class PostsActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        drawerLayout.closeDrawer(Gravity.LEFT, false);
     }
 
     @Override

@@ -37,6 +37,9 @@ public class PostCommentDialog extends DialogFragment {
         actionDoPostComment = (TextView) view.findViewById(R.id.action_do_post_comment);
         actionDoCancelPosting = (TextView) view.findViewById(R.id.action_do_cancel_posting);
 
+        comment = (Comment) getArguments().getSerializable("comment");
+        comment.setPost((Post) getArguments().getSerializable("post"));
+
         actionDoCancelPosting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){

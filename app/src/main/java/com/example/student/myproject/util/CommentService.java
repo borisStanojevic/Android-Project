@@ -6,6 +6,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -17,4 +18,7 @@ public interface CommentService {
 
     @POST("posts/{postId}/comments")
     Call<Comment> create(@Path("postId") int postId, @Body Comment comment);
+
+    @DELETE("posts/{postId}/comments/{commentId}")
+    Call<Void> delete(@Path("postId") int postId, @Path("commentId") int commentId);
 }

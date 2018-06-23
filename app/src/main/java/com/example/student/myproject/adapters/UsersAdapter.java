@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.example.student.myproject.R;
 import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.Util;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -33,7 +36,8 @@ public class UsersAdapter extends ArrayAdapter<User> {
         }
 
         ImageView ivUserPhoto = (ImageView)convertView.findViewById(R.id.user_photo);
-        ivUserPhoto.setImageResource(R.drawable.default_user_photo); // PROMIJENITI DA BUDE SLIKA SA SERVERA
+        String url = Util.SERVICE_API_PATH + "images/" + user.getPhoto();
+        Picasso.get().load(url).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(ivUserPhoto);
         TextView tvUserUsername = (TextView)convertView.findViewById(R.id.user_username);
         tvUserUsername.setText(user.getUsername().toString());
         TextView tvUserFullName = (TextView)convertView.findViewById(R.id.user_fullname);

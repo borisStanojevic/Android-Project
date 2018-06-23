@@ -53,7 +53,8 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString("loggedInUserUsername", user.getUsername());
                 editor.commit();
 
-                Intent intent = new Intent(LoginActivity.this, PostsActivity.class);
+                Intent intent = new Intent(LoginActivity.this, UserActivity.class);
+                intent.putExtra("username", user.getUsername());
                 startActivity(intent);
                 finish();
             }

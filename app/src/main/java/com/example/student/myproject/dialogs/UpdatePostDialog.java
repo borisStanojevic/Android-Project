@@ -15,6 +15,8 @@ import com.example.student.myproject.R;
 import com.example.student.myproject.ReadPostActivity;
 import com.example.student.myproject.UserActivity;
 import com.example.student.myproject.model.Post;
+import com.example.student.myproject.model.Tag;
+import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
@@ -28,6 +30,7 @@ public class UpdatePostDialog extends DialogFragment {
     private Post post;
     private EditText etTitle;
     private EditText etContent;
+    private EditText etTags;
     private TextView tvActionConfirm;
     private TextView tvActionCancel;
 
@@ -38,12 +41,25 @@ public class UpdatePostDialog extends DialogFragment {
 
         etTitle = (EditText) view.findViewById(R.id.et_title);
         etContent = (EditText) view.findViewById(R.id.et_content);
+        etTags = (EditText) view.findViewById(R.id.et_tags);
         tvActionConfirm = (TextView) view.findViewById(R.id.action_confirm);
         tvActionCancel = (TextView) view.findViewById(R.id.action_cancel);
 
         post = (Post) getArguments().getSerializable("post");
         etTitle.setText(post.getTitle());
         etContent.setText(post.getContent());
+        if(post.getTags() != null)
+        {
+            if(post.getTags().size() == 1)
+                etTags.setText(post.getTags().get(0).getName());
+            else
+                {
+                for (Tag tag : post.getTags())
+                    etTags.append(tag.getName() + ";");
+                }
+        }
+        if (etTags.getText().toString() != null && !"".equals(etTags.getText().toString()))
+            etTags.setText(etTags.getText().toString().subSequence(0, etTags.getText().toString().length() - 1));
 
         tvActionCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +75,36 @@ public class UpdatePostDialog extends DialogFragment {
             {
                 post.setTitle(etTitle.getText().toString().trim());
                 post.setContent(etContent.getText().toString().trim());
+                post.getTags().clear();
+                String tags = etTags.getText().toString();
+
+                String[] tagsTokens;
+                try
+                {
+                    tagsTokens = tags.split(";");
+                }
+                //Ako ne uspije tokenizacija znaci ili da nema tagova ili da ima jedan tag
+                catch (Exception exc)
+                {
+                    //Ako ima jedan tag
+                    if(tags != null && !"".equals(tags)) {
+                        tagsTokens = new String[1];
+                        tagsTokens[0] = tags;
+                    }
+                    else
+                        tagsTokens = new String[0];
+                }
+
+                for(int i = 0 ; i < tagsTokens.length ; i++)
+                {
+                    if(tagsTokens[i] != null && !"".equals(tagsTokens[i]))
+                    {
+                        Tag tag = new Tag();
+                        tag.setName(tagsTokens[i].trim());
+                        post.getTags().add(tag);
+                    }
+                }
+
                 PostService postService = Util.retrofit.create(PostService.class);
                 final Call<Post> call = postService.update(post);
                 call.enqueue(new Callback<Post>() {

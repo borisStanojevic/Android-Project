@@ -2,9 +2,10 @@ package com.example.student.myproject.model;
 
 import android.net.wifi.WifiConfiguration;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Comment {
+public class Comment implements Serializable {
 
     private int id;
     private String content;

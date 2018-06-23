@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class Util {
 
-    private static final String SERVICE_API_PATH = "http://192.168.0.105:8080/posts-portal/";
+    public static final String SERVICE_API_PATH = "http://192.168.0.105:8080/posts-portal/";
 
     public static final Retrofit retrofit = new Retrofit
             .Builder()

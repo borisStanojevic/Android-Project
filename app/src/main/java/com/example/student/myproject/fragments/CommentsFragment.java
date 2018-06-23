@@ -5,7 +5,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -30,6 +32,8 @@ import com.example.student.myproject.util.CommentService;
 import com.example.student.myproject.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -69,13 +73,13 @@ public class CommentsFragment extends ListFragment implements AdapterView.OnItem
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         lastItemClickedPosition = 0;
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         menu.add(0, 0, Menu.NONE, "Comment").setIcon(R.drawable.baseline_comment_24).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//        menu.add(0, 1, Menu.NONE, "Delete").setIcon(R.drawable.baseline_delete_24).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         super.onPrepareOptionsMenu(menu);
     }
 
@@ -99,6 +103,7 @@ public class CommentsFragment extends ListFragment implements AdapterView.OnItem
                 {
                     comments.clear();
                     comments.addAll(response.body());
+                    sortComments(comments);
                     ((ArrayAdapter<Comment>) getListAdapter()).notifyDataSetChanged();
                 }
             }
@@ -128,20 +133,59 @@ public class CommentsFragment extends ListFragment implements AdapterView.OnItem
                 Post post = new Post();
                 post.setId(postId);
                 Comment comment = new Comment();
-                comment.setPost(post);
                 comment.setAuthor(author);
 
-                postCommentDialog.setComment(comment);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("comment", comment);
+                bundle.putSerializable("post", post);
+                postCommentDialog.setArguments(bundle);
 
                 postCommentDialog.show(fragmentManager, "Comment");
 
                 return true;
-//            case 1:
-////                Toast.makeText(getActivity().getApplicationContext(), "Brisanje" + lastItemClickedPosition, Toast.LENGTH_SHORT).show();
-////                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private Comparator<Comment> createCommentComparator(String key) {
+        if ("date_asc".equalsIgnoreCase(key)) {
+            return new Comparator<Comment>() {
+                @Override
+                public int compare(Comment o1, Comment o2) {
+                    return o1.getDate().compareTo(o2.getDate());
+                }
+            };
+        } else if ("pop_asc".equalsIgnoreCase(key)) {
+            return new Comparator<Comment>() {
+                @Override
+                public int compare(Comment o1, Comment o2) {
+                    return o1.getLikes() - o2.getLikes();
+                }
+            };
+        } else if ("pop_desc".equalsIgnoreCase(key)) {
+            return new Comparator<Comment>() {
+                @Override
+                public int compare(Comment o1, Comment o2) {
+                    return o2.getLikes() - o1.getLikes();
+                }
+            };
+        } else {
+            return new Comparator<Comment>() {
+                @Override
+                public int compare(Comment o1, Comment o2) {
+                    return o2.getDate().compareTo(o1.getDate());
+                }
+            };
+        }
+    }
+
+    private void sortComments(List<Comment> commentsList) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String postsSortingKey = sharedPreferences.getString("comments_preference", "date_desc");
+        Comparator<Comment> commentComparator = createCommentComparator(postsSortingKey);
+        Collections.sort(commentsList, commentComparator);
     }
 
 }

@@ -151,5 +151,21 @@ public class Post implements Serializable {
         this.comments = comments;
     }
 
-
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", author=" + author +
+                ", photo='" + photo + '\'' +
+                ", date='" + date + '\'' +
+                ", locationLatitude=" + locationLatitude +
+                ", locationLongitude=" + locationLongitude +
+                ", location=" + location +
+                ", tags=" + tags +
+                ", likes=" + likes +
+                ", dislikes=" + dislikes +
+                '}';
+    }
 }

@@ -26,6 +26,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -234,7 +235,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 String[] tagsTokens;
                 try
                 {
-                    tagsTokens = tags.split(",");
+                    tagsTokens = tags.split(";");
                 }
                 catch (Exception exc)
                 {
@@ -264,6 +265,7 @@ public class CreatePostActivity extends AppCompatActivity {
                     {
                         Intent intent = new Intent(CreatePostActivity.this, PostsActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                     @Override
                     public void onFailure(Call<Post> call, Throwable t)
@@ -338,6 +340,7 @@ public class CreatePostActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        drawerLayout.closeDrawer(Gravity.LEFT, false);
     }
 
     @Override

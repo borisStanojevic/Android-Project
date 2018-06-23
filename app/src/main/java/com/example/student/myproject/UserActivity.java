@@ -3,11 +3,17 @@ package com.example.student.myproject;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -15,12 +21,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +38,17 @@ import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,6 +60,67 @@ public class UserActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
+
+    private String imagePath;
+
+    public void chooseImageBtn(View view)
+    {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK)
+        {
+            if(data == null)
+            {
+                Toast.makeText(this, "Unable to choose image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Uri imageUri = data.getData();
+            imagePath = getRealPathFromUri(imageUri);
+            File file = new File(imagePath);
+            String extension = file.getName().split("\\.")[1];
+
+            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", user.getUsername() + "." + extension , requestBody);
+
+            UserService userService = Util.retrofit.create(UserService.class);
+            Call<User> call = userService.uploadPhoto(filePart);
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, final Response<User> response)
+                {
+                    Intent i = new Intent(UserActivity.this, UsersActivity.class);
+                    startActivity(i);
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t)
+                {
+                    Toast.makeText(UserActivity.this, "Failed to upload photo : " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private  String getRealPathFromUri(Uri uri)
+    {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(getApplicationContext(), uri, projection, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(columnIndex);
+        cursor.close();
+        return  result;
+    }
+
+
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -129,7 +208,6 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
 
         UserService userService = Util.retrofit.create(UserService.class);
         final Call<User> call = userService.getByUsername(getIntent().getStringExtra("username"));
@@ -224,6 +302,9 @@ public class UserActivity extends AppCompatActivity {
 
 
     private void fillLayout(User user) {
+        ImageView ivPhoto = (ImageView) findViewById(R.id.iv_user_photo);
+        String url = Util.SERVICE_API_PATH + "images/" + user.getPhoto();
+        Picasso.get().load(url).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(ivPhoto);
         TextView tvFullName = (TextView) findViewById(R.id.tv_user_full_name);
         tvFullName.setText(user.getFullName());
         TextView tvEmail = (TextView) findViewById(R.id.tv_user_email);
@@ -234,5 +315,9 @@ public class UserActivity extends AppCompatActivity {
         tvPassword.setText(user.getPassword());
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        drawerLayout.closeDrawer(Gravity.LEFT, false);
+    }
 }

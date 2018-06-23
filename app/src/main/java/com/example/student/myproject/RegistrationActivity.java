@@ -1,6 +1,10 @@
 package com.example.student.myproject;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,10 +13,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.UserService;
+import com.example.student.myproject.util.Util;
+
 import org.w3c.dom.Text;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -114,17 +126,47 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
-    public void register(View view) {
-        String username = inputUsername.getText().toString();
-        String email = inputEmail.getText().toString();
-        String password = inputPassword.getText().toString();
-        
-        if("opaopa".equals(username) && "123456".equals(password) && "twins@ludo.bre".equals(email))
-            Toast.makeText(this, "Opa opa pogodi me ko iz topa", Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(this, "Opa opa penis", Toast.LENGTH_SHORT).show();
+    public void register(final View view) {
+        String username = inputUsername.getText().toString().trim();
+        String email = inputEmail.getText().toString().trim();
+        String password = inputPassword.getText().toString().trim();
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+
+        UserService userService = Util.retrofit.create(UserService.class);
+        final Call<User> call = userService.register(user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(response.code() == 400)
+                {
+                    Snackbar.make(view.getRootView(), "Username/Email already exists", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("loggedInUserUsername", response.body().getUsername());
+                editor.commit();
+
+                Intent intent = new Intent(RegistrationActivity.this, UserActivity.class);
+                intent.putExtra("username", response.body().getUsername());
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t)
+            {
+                Snackbar.make(view.getRootView(), t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
 
     }
 }

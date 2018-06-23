@@ -3,18 +3,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginTop="20dp"
-    android:orientation="vertical">
+    android:padding="10dp">
 
+    <LinearLayout
+        android:id="@+id/post_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/iv_post_photo"
+            android:layout_width="200dp"
+            android:layout_height="180dp" />
+
+        <ImageButton
+            android:id="@+id/btn_upload_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7.5dp"
+            android:text="Upload"
+            app:srcCompat="@drawable/outline_camera_alt_24" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_post_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/post_header"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="5dp" />
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_post_content"
@@ -28,14 +48,23 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/tv_post_content"
+        android:layout_marginBottom="2.5dp"
+        android:layout_marginTop="2.5dp"
         android:background="#000000" />
+
+    <ImageView
+        android:id="@+id/iv_post_author_photo"
+        android:layout_width="24dp"
+        android:layout_height="22dp"
+        android:layout_marginRight="3.5dp"
+        android:layout_below="@id/divider" />
 
     <TextView
         android:id="@+id/tv_post_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/divider" />
+        android:layout_below="@id/divider"
+        android:layout_toRightOf="@id/iv_post_author_photo" />
 
     <TextView
         android:id="@+id/tv_date_posted"
@@ -61,32 +90,36 @@
 
     <TextView
         android:id="@+id/tv_post_likes"
-        android:layout_below="@id/tv_post_tags"
-        android:layout_alignParentLeft="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tv_post_tags"
+        android:textColor="#00cc00" />
+
     <TextView
         android:id="@+id/tv_post_dislikes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tv_post_tags"
         android:layout_toRightOf="@id/tv_post_likes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textColor="#ff033d" />
+
     <ImageButton
         android:id="@+id/btn_like_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        app:srcCompat="@drawable/baseline_thumb_up_alt_24"
         android:layout_below="@id/tv_post_likes"
-        android:text="@string/like" />
+        android:text="@string/like"
+        app:srcCompat="@drawable/baseline_thumb_up_alt_24" />
 
     <ImageButton
         android:id="@+id/btn_dislike_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/baseline_thumb_down_alt_24"
         android:layout_below="@id/tv_post_likes"
         android:layout_toRightOf="@id/btn_like_post"
-        android:text="@string/dislike" />
+        android:text="@string/dislike"
+        app:srcCompat="@drawable/baseline_thumb_down_alt_24" />
 
 </RelativeLayout>
