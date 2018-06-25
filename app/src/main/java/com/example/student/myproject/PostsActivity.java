@@ -27,6 +27,7 @@ import com.example.student.myproject.adapters.PostsAdapter;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.Util;
 
 import java.util.ArrayList;
@@ -267,7 +268,7 @@ public class PostsActivity extends AppCompatActivity {
         postsListView = (ListView) findViewById(R.id.posts_list_view);
 
         PostService postService = Util.retrofit.create(PostService.class);
-        final Call<List<Post>> call = postService.getAll();
+        final Call<List<Post>> call = postService.getAll(TokenProvider.getToken(getApplicationContext()));
         call.enqueue(new Callback<List<Post>>() {
             @Override
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response)

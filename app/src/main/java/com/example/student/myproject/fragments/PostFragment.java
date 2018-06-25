@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
@@ -33,11 +34,14 @@ import com.example.student.myproject.UsersActivity;
 import com.example.student.myproject.dialogs.UpdatePostDialog;
 import com.example.student.myproject.dialogs.UserDialog;
 import com.example.student.myproject.model.Post;
+import com.example.student.myproject.model.Role;
 import com.example.student.myproject.model.Tag;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -81,7 +85,7 @@ public class PostFragment extends Fragment {
             MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", post.getId() + "." + extension , requestBody);
 
             PostService postService = Util.retrofit.create(PostService.class);
-            Call<Post> call = postService.uploadPhoto(filePart);
+            Call<Post> call = postService.uploadPhoto(TokenProvider.getToken(getContext()), filePart);
             call.enqueue(new Callback<Post>() {
                 @Override
                 public void onResponse(Call<Post> call, final Response<Post> response)
@@ -162,6 +166,7 @@ public class PostFragment extends Fragment {
         {
             @Override
             public void onClick(View v) {
+
                 //Ako ulogovani nije autor posta ne moze like
                 if(getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null)
                     .equals(post.getAuthor().getUsername()))
@@ -211,6 +216,34 @@ public class PostFragment extends Fragment {
         chooseImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                String jwtToken = sharedPreferences.getString("token", "");
+                String token = "Bearer " + jwtToken;
+                String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                ObjectMapper objectMapper = new ObjectMapper();
+                User currentUser = null;
+                boolean currentUserIsAdmin = false;
+                try {
+                    currentUser = objectMapper.readValue(currentUserJson, User.class);
+                    for(Role role : currentUser.getRoles())
+                    {
+                        if(role.getRole().equalsIgnoreCase("ROLE_ADMIN"))
+                        {
+                            currentUserIsAdmin = true;
+                            break;
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(!currentUser.getUsername().equals(post.getAuthor().getUsername()) && !currentUserIsAdmin)
+                {
+                    Snackbar.make(getView(), "You are unauthorized for this action", Snackbar.LENGTH_LONG).show();;
+                    return;
+                }
+
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
                 startActivityForResult(intent, 0);
@@ -242,7 +275,7 @@ public class PostFragment extends Fragment {
 
         //Radim GET zahtjev serveru za post ciji je id 'id'
         PostService postService = Util.retrofit.create(PostService.class);
-        final Call<Post> call = postService.getById(id);
+        final Call<Post> call = postService.getById(TokenProvider.getToken(getContext()), id);
         call.enqueue(new Callback<Post>() {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response)
@@ -266,10 +299,30 @@ public class PostFragment extends Fragment {
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
             case R.id.action_delete:
-                if(getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null) != null
-                        && !(getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE).getString("loggedInUserUsername", null).equals(post.getAuthor().getUsername())))
+                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                String jwtToken = sharedPreferences.getString("token", "");
+                String token = "Bearer " + jwtToken;
+                String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                ObjectMapper objectMapper = new ObjectMapper();
+                User currentUser = null;
+                boolean currentUserIsAdmin = false;
+                try {
+                    currentUser = objectMapper.readValue(currentUserJson, User.class);
+                    for(Role role : currentUser.getRoles())
+                    {
+                        if(role.getRole().equalsIgnoreCase("ROLE_ADMIN"))
+                        {
+                            currentUserIsAdmin = true;
+                            break;
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(!currentUser.getUsername().equals(post.getAuthor().getUsername()) && !currentUserIsAdmin)
                 {
-                    Snackbar.make(getView(),"You are not the author of this post",Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), "You are unauthorized for this action", Snackbar.LENGTH_LONG).show();;
                     break;
                 }
                 else {
@@ -279,7 +332,7 @@ public class PostFragment extends Fragment {
                             switch (which){
                                 case DialogInterface.BUTTON_POSITIVE:
                                     PostService postService = Util.retrofit.create(PostService.class);
-                                    final Call<Void> call = postService.delete(post.getId());
+                                    final Call<Void> call = postService.delete(TokenProvider.getToken(getContext()), post.getId());
                                     call.enqueue(new Callback<Void>() {
                                         @Override
                                         public void onResponse(Call<Void> call, Response<Void> response) {

@@ -21,4 +21,11 @@
         <item>Settings</item>
         <item>Log Out</item>
     </string-array>
+
+    <string-array name="roles_array">
+        <item>ROLE_COMMENTATOR</item>
+        <item>ROLE_PUBLISHER</item>
+        <item>ROLE_ADMIN</item>
+    </string-array>
+
 </resources>

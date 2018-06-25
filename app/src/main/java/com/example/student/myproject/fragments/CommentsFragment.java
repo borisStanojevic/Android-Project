@@ -29,6 +29,7 @@ import com.example.student.myproject.model.Comment;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.CommentService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.Util;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class CommentsFragment extends ListFragment implements AdapterView.OnItem
         int postId = bundle.getInt("postId");
 
         CommentService commentService = Util.retrofit.create(CommentService.class);
-        final Call<List<Comment>> call = commentService.getAll(postId);
+        final Call<List<Comment>> call = commentService.getAll(TokenProvider.getToken(getContext()), postId);
         call.enqueue(new Callback<List<Comment>>() {
             @Override
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response)

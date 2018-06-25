@@ -16,6 +16,7 @@ import com.example.student.myproject.model.Comment;
 import com.example.student.myproject.model.Post;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.CommentService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.Util;
 
 import retrofit2.Call;
@@ -54,10 +55,8 @@ public class PostCommentDialog extends DialogFragment {
                 if(!"".equals(etCommentContent.getText().toString()))
                 {
                     comment.setContent(etCommentContent.getText().toString());
-                    //Komentar servis, POST zahtjev ka serveru za kreiranje komentara, post na koji se komentar odnosi i autor koji ga kreira cu proslijediti iz CommentsFragment
-                    //odatle dobavljam ulogovanog korisnika i trenutni post
                     CommentService commentService = Util.retrofit.create(CommentService.class);
-                    final Call<Comment> call = commentService.create(comment.getPost().getId(), comment);
+                    final Call<Comment> call = commentService.create(TokenProvider.getToken(getActivity().getApplicationContext()),comment.getPost().getId(), comment);
                     call.enqueue(new Callback<Comment>() {
                         @Override
                         public void onResponse(Call<Comment> call, Response<Comment> response)

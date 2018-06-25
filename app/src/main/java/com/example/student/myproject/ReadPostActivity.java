@@ -107,9 +107,12 @@ public class ReadPostActivity extends AppCompatActivity {
                     startActivity(new Intent(ReadPostActivity.this, PostsActivity.class));
                     break;
                 case 2:
-                    startActivity(new Intent(ReadPostActivity.this, SettingsActivity.class));
+                    startActivity(new Intent(ReadPostActivity.this, UsersActivity.class));
                     break;
                 case 3:
+                    startActivity(new Intent(ReadPostActivity.this, SettingsActivity.class));
+                    break;
+                case 4:
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

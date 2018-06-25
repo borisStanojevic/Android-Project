@@ -25,11 +25,11 @@
 
         <EditText
             android:id="@+id/et_email"
-            android:inputType="textEmailAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_username"
-            android:hint="Email" />
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/et_full_name"
@@ -43,8 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_full_name"
-            android:hint="Password"
-            />
+            android:hint="Password" />
 
         <TextView
             android:id="@+id/action_confirm"

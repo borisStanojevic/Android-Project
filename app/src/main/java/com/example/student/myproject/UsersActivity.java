@@ -26,10 +26,14 @@ import android.widget.Toast;
 
 import com.example.student.myproject.adapters.UsersAdapter;
 import com.example.student.myproject.dialogs.UserDialog;
+import com.example.student.myproject.model.Role;
 import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,12 +57,14 @@ public class UsersActivity extends AppCompatActivity {
                     break;
                 case 1:
                     startActivity(new Intent(UsersActivity.this, PostsActivity.class));
-
                     break;
                 case 2:
-                    startActivity(new Intent(UsersActivity.this, SettingsActivity.class));
+                    startActivity(new Intent(UsersActivity.this, UsersActivity.class));
                     break;
                 case 3:
+                    startActivity(new Intent(UsersActivity.this, SettingsActivity.class));
+                    break;
+                case 4:
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -90,7 +96,7 @@ public class UsersActivity extends AppCompatActivity {
     //----------------------------------------//
     private ListView usersListView;
     private UsersAdapter usersAdapter;
-    private List<User> users;
+    public static List<User> users;
     private class UsersItemClickListener implements ListView.OnItemClickListener{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -107,6 +113,31 @@ public class UsersActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+        ObjectMapper objectMapper = new ObjectMapper();
+        User currentUser = null;
+        boolean currentUserIsCommentator = false;
+        try {
+            currentUser = objectMapper.readValue(currentUserJson, User.class);
+            currentUserIsCommentator = false;
+            for (Role role : currentUser.getRoles()) {
+                if (role.getRole().equalsIgnoreCase("ROLE_COMMENTATOR")) {
+                    currentUserIsCommentator = true;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(currentUserIsCommentator)
+        {
+            Toast.makeText(UsersActivity.this, "You are unauthorized for this action", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_users);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -186,7 +217,7 @@ public class UsersActivity extends AppCompatActivity {
         usersListView = (ListView) findViewById(R.id.users_list_view);
 
         UserService userService = Util.retrofit.create(UserService.class);
-        final Call<List<User>> call = userService.getAll();
+        final Call<List<User>> call = userService.getAll(TokenProvider.getToken(getApplicationContext()));
         call.enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response)

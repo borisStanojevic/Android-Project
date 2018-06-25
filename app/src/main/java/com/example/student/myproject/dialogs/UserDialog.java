@@ -1,22 +1,32 @@
 package com.example.student.myproject.dialogs;
 
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.R;
 import com.example.student.myproject.UserActivity;
+import com.example.student.myproject.UsersActivity;
+import com.example.student.myproject.model.Role;
 import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,7 +52,6 @@ public class UserDialog extends DialogFragment {
         etPassword = (EditText) view.findViewById(R.id.et_password);
         tvActionConfirm = (TextView) view.findViewById(R.id.action_confirm);
         tvActionCancel = (TextView) view.findViewById(R.id.action_cancel);
-
 
         tvActionCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,11 +83,12 @@ public class UserDialog extends DialogFragment {
                     String fullName = etFullName.getText().toString().trim();
 
                     UserService userService = Util.retrofit.create(UserService.class);
-                    final Call<User> call = userService.create(new User(username, password, email, fullName));
+                    final Call<User> call = userService.create(TokenProvider.getToken(getActivity().getApplicationContext()),new User(username, password, email, fullName));
                     call.enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(Call<User> call, Response<User> response)
                         {
+                            UsersActivity.users.add(response.body());
                             getDialog().dismiss();
                         }
 
@@ -108,8 +118,48 @@ public class UserDialog extends DialogFragment {
                     user.setEmail(etEmail.getText().toString().trim());
                     user.setFullName(etFullName.getText().toString().trim());
 
+                    SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                    //*
+                    String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    try {
+                        User currentUser = objectMapper.readValue(currentUserJson, User.class);
+                        boolean currentUserIsAdmin = false;
+                        for(Role role : currentUser.getRoles())
+                        {
+                            if(role.getRole().equalsIgnoreCase("ROLE_ADMIN"))
+                            {
+                                currentUserIsAdmin = true;
+                                break;
+                            }
+                        }
+                        //Ako je update, ne moze da updateuje neko ko nije taj korisnik ili admin
+                        if(user != null) {
+                            if (!currentUser.getUsername().equals(user.getUsername()) && !currentUserIsAdmin) {
+                                UserDialog.this.dismiss();
+                                Toast.makeText(getActivity(), "You are unauthorized for this action", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+                        //Ako je dodavanje ne moze da doda niko ko nije admin
+                        if(user == null)
+                        {
+                            if(!currentUserIsAdmin)
+                            {
+                                UserDialog.this.dismiss();
+                                Toast.makeText(getActivity(), "You are unauthorized for this action", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    //*
+                    String jwtToken = sharedPreferences.getString("token", "");
+                    String token = "Bearer " + jwtToken;
+
                     UserService userService = Util.retrofit.create(UserService.class);
-                    final Call<User> call = userService.update(user);
+                    final Call<User> call = userService.update(TokenProvider.getToken(getActivity().getApplicationContext()), user);
                     call.enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(Call<User> call, Response<User> response)

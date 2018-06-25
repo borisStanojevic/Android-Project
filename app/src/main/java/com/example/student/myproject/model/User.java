@@ -14,15 +14,17 @@ public class User implements Serializable {
     private String password;
     private String email;
 
+    private List<Role> roles;
     private transient List<Post> posts;
     private transient List<Comment> comments;
 
     public User() {
+        roles = new ArrayList<Role>();
         posts = new ArrayList<Post>();
         comments = new ArrayList<Comment>();
     }
 
-    public User(String fullName, String username, String password, String email) {
+    public User(String username, String password, String email, String fullName) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
@@ -85,5 +87,11 @@ public class User implements Serializable {
         this.comments = comments;
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
 
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
 }

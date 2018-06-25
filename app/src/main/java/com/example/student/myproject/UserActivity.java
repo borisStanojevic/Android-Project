@@ -34,16 +34,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.dialogs.UserDialog;
+import com.example.student.myproject.model.Role;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -53,6 +57,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.http.Header;
 
 public class UserActivity extends AppCompatActivity {
 
@@ -60,11 +65,38 @@ public class UserActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-
     private String imagePath;
+    private String jwtToken;
 
-    public void chooseImageBtn(View view)
-    {
+    public void chooseImageBtn(View view) {
+
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+        ObjectMapper objectMapper = new ObjectMapper();
+        User currentUser = null;
+        boolean currentUserIsAdmin = false;
+        try {
+            currentUser = objectMapper.readValue(currentUserJson, User.class);
+            currentUserIsAdmin = false;
+            for (Role role : currentUser.getRoles()) {
+                if (role.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+                    currentUserIsAdmin = true;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //Ako nije admin nema
+        if(!currentUserIsAdmin)
+        {
+            if(!currentUser.getUsername().equals(user.getUsername()))
+            {
+                Toast.makeText(UserActivity.this, "You are unauthorized for this action", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, 0);
@@ -74,10 +106,8 @@ public class UserActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(resultCode == RESULT_OK)
-        {
-            if(data == null)
-            {
+        if (resultCode == RESULT_OK) {
+            if (data == null) {
                 Toast.makeText(this, "Unable to choose image", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -87,29 +117,26 @@ public class UserActivity extends AppCompatActivity {
             String extension = file.getName().split("\\.")[1];
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", user.getUsername() + "." + extension , requestBody);
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", user.getUsername() + "." + extension, requestBody);
 
             UserService userService = Util.retrofit.create(UserService.class);
-            Call<User> call = userService.uploadPhoto(filePart);
+            Call<User> call = userService.uploadPhoto(TokenProvider.getToken(getApplicationContext()),filePart);
             call.enqueue(new Callback<User>() {
                 @Override
-                public void onResponse(Call<User> call, final Response<User> response)
-                {
+                public void onResponse(Call<User> call, final Response<User> response) {
                     Intent i = new Intent(UserActivity.this, UsersActivity.class);
                     startActivity(i);
                 }
 
                 @Override
-                public void onFailure(Call<User> call, Throwable t)
-                {
+                public void onFailure(Call<User> call, Throwable t) {
                     Toast.makeText(UserActivity.this, "Failed to upload photo : " + t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         }
     }
 
-    private  String getRealPathFromUri(Uri uri)
-    {
+    private String getRealPathFromUri(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         CursorLoader cursorLoader = new CursorLoader(getApplicationContext(), uri, projection, null, null, null);
         Cursor cursor = cursorLoader.loadInBackground();
@@ -117,9 +144,8 @@ public class UserActivity extends AppCompatActivity {
         cursor.moveToFirst();
         String result = cursor.getString(columnIndex);
         cursor.close();
-        return  result;
+        return result;
     }
-
 
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -131,12 +157,14 @@ public class UserActivity extends AppCompatActivity {
                     break;
                 case 1:
                     startActivity(new Intent(UserActivity.this, PostsActivity.class));
-
-                    break;
+                break;
                 case 2:
-                    startActivity(new Intent(UserActivity.this, SettingsActivity.class));
+                    startActivity(new Intent(UserActivity.this, UsersActivity.class));
                     break;
                 case 3:
+                    startActivity(new Intent(UserActivity.this, SettingsActivity.class));
+                    break;
+                case 4:
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -209,8 +237,10 @@ public class UserActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+
         UserService userService = Util.retrofit.create(UserService.class);
-        final Call<User> call = userService.getByUsername(getIntent().getStringExtra("username"));
+        final Call<User> call = userService.getByUsername(TokenProvider.getToken(getApplicationContext()), getIntent().getStringExtra("username"));
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -244,18 +274,49 @@ public class UserActivity extends AppCompatActivity {
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
             case R.id.action_delete:
+                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                ObjectMapper objectMapper = new ObjectMapper();
+                User currentUser = null;
+                boolean currentUserIsAdmin = false;
+                try {
+                    currentUser = objectMapper.readValue(currentUserJson, User.class);
+                    currentUserIsAdmin = false;
+                    for (Role role : currentUser.getRoles()) {
+                        if (role.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+                            currentUserIsAdmin = true;
+                            break;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //Ako nije admin nema brisanja
+                if(!currentUserIsAdmin) {
+                    Toast.makeText(UserActivity.this, "You are unauthorized for this action", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                //U suprotnome je admin pa ->
+                else {
+                    //Ako pokusava da izbrise svoj profil ne daj
+                    if (currentUser.getUsername().equals(user.getUsername())) {
+                        Toast.makeText(UserActivity.this, "You are unauthorized for this action", Toast.LENGTH_LONG).show();
+                        break;
+                    }
+                }
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                 UserService userService = Util.retrofit.create(UserService.class);
-                                final Call<Void> call = userService.delete(user.getUsername());
+                                final Call<Void> call = userService.delete(TokenProvider.getToken(getApplicationContext()), user.getUsername());
                                 call.enqueue(new Callback<Void>() {
                                     @Override
                                     public void onResponse(Call<Void> call, Response<Void> response) {
                                         Intent intent = new Intent(UserActivity.this, UsersActivity.class);
                                         startActivity(intent);
+                                        finish();
                                     }
 
                                     @Override

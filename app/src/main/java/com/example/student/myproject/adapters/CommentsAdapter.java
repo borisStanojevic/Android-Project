@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.media.Image;
 import android.support.annotation.NonNull;
@@ -20,11 +21,17 @@ import android.widget.Toast;
 
 import com.example.student.myproject.PostsActivity;
 import com.example.student.myproject.R;
+import com.example.student.myproject.UsersActivity;
 import com.example.student.myproject.fragments.CommentsFragment;
 import com.example.student.myproject.model.Comment;
+import com.example.student.myproject.model.Role;
+import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.CommentService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -125,6 +132,31 @@ public class CommentsAdapter extends ArrayAdapter<Comment> {
             @Override
             public void onClick(View v)
             {
+
+                SharedPreferences sharedPreferences = getContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                ObjectMapper objectMapper = new ObjectMapper();
+                User currentUser = null;
+                boolean currentUserIsAdmin = false;
+                try {
+                    currentUser = objectMapper.readValue(currentUserJson, User.class);
+                    currentUserIsAdmin = false;
+                    for (Role role : currentUser.getRoles()) {
+                        if (role.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+                            currentUserIsAdmin = true;
+                            break;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(!currentUserIsAdmin)
+                {
+                    Snackbar.make(parent, "Unauthorized : Only admins can delete comments", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which)
@@ -133,7 +165,7 @@ public class CommentsAdapter extends ArrayAdapter<Comment> {
                         {
                             case DialogInterface.BUTTON_POSITIVE:
                                 CommentService commentService = Util.retrofit.create(CommentService.class);
-                                final Call<Void> call = commentService.delete(-1, comment.getId());
+                                final Call<Void> call = commentService.delete(TokenProvider.getToken(getContext()), -1 , comment.getId());
                                 call.enqueue(new Callback<Void>() {
                                     @Override
                                     public void onResponse(Call<Void> call, Response<Void> response)
@@ -141,8 +173,9 @@ public class CommentsAdapter extends ArrayAdapter<Comment> {
                                         if(response.code() == 200) {
                                             CommentsFragment.comments.remove(comment);
                                             CommentsAdapter.this.notifyDataSetChanged();
+                                            Snackbar.make(parent, "Comment deleted", Snackbar.LENGTH_SHORT).show();
                                         }
-                                        Snackbar.make(parent, "Comment deleted", Snackbar.LENGTH_SHORT).show();
+
                                     }
                                     @Override
                                     public void onFailure(Call<Void> call, Throwable t)

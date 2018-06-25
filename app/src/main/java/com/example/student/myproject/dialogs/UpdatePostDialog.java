@@ -1,9 +1,12 @@
 package com.example.student.myproject.dialogs;
 
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +18,16 @@ import com.example.student.myproject.R;
 import com.example.student.myproject.ReadPostActivity;
 import com.example.student.myproject.UserActivity;
 import com.example.student.myproject.model.Post;
+import com.example.student.myproject.model.Role;
 import com.example.student.myproject.model.Tag;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -105,12 +113,38 @@ public class UpdatePostDialog extends DialogFragment {
                     }
                 }
 
+                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                //*
+                String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    User currentUser = objectMapper.readValue(currentUserJson, User.class);
+                    boolean currentUserIsAdmin = false;
+                    for(Role role : currentUser.getRoles())
+                    {
+                        if(role.getRole().equalsIgnoreCase("ROLE_ADMIN"))
+                        {
+                            currentUserIsAdmin = true;
+                            break;
+                        }
+                    }
+                    if(!currentUser.getUsername().equals(post.getAuthor().getUsername()) && !currentUserIsAdmin)
+                    {
+                        UpdatePostDialog.this.dismiss();
+                        Toast.makeText(getActivity(), "You are unauthorized for this action", Snackbar.LENGTH_LONG).show();;
+                        return;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 PostService postService = Util.retrofit.create(PostService.class);
-                final Call<Post> call = postService.update(post);
+                final Call<Post> call = postService.update(TokenProvider.getToken(getActivity().getApplicationContext()), post);
                 call.enqueue(new Callback<Post>() {
                     @Override
                     public void onResponse(Call<Post> call, Response<Post> response)
                     {
+
                         post = response.body();
                         Intent intent = new Intent(getActivity(), ReadPostActivity.class);
                         intent.putExtra("id", post.getId());

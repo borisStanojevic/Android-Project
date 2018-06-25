@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.model.User;
+import com.example.student.myproject.util.RegisterService;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
 
@@ -139,8 +140,8 @@ public class RegistrationActivity extends AppCompatActivity {
         user.setPassword(password);
         user.setEmail(email);
 
-        UserService userService = Util.retrofit.create(UserService.class);
-        final Call<User> call = userService.register(user);
+        RegisterService registerService= Util.retrofit.create(RegisterService.class);
+        final Call<User> call = registerService.register(user);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -150,13 +151,9 @@ public class RegistrationActivity extends AppCompatActivity {
                     return;
                 }
 
-                SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("loggedInUserUsername", response.body().getUsername());
-                editor.commit();
-
-                Intent intent = new Intent(RegistrationActivity.this, UserActivity.class);
+                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
                 intent.putExtra("username", response.body().getUsername());
+                intent.putExtra("password", response.body().getPassword());
                 startActivity(intent);
                 finish();
             }

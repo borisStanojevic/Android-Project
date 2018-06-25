@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -39,12 +40,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.student.myproject.adapters.PostsAdapter;
+import com.example.student.myproject.dialogs.UpdatePostDialog;
 import com.example.student.myproject.model.Post;
+import com.example.student.myproject.model.Role;
 import com.example.student.myproject.model.Tag;
 import com.example.student.myproject.model.User;
 import com.example.student.myproject.util.PostService;
+import com.example.student.myproject.util.TokenProvider;
 import com.example.student.myproject.util.UserService;
 import com.example.student.myproject.util.Util;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.List;
@@ -77,12 +82,14 @@ public class CreatePostActivity extends AppCompatActivity {
                     break;
                 case 1:
                     startActivity(new Intent(CreatePostActivity.this, PostsActivity.class));
-
                     break;
                 case 2:
-                    startActivity(new Intent(CreatePostActivity.this, SettingsActivity.class));
+                    startActivity(new Intent(CreatePostActivity.this, UsersActivity.class));
                     break;
                 case 3:
+                    startActivity(new Intent(CreatePostActivity.this, SettingsActivity.class));
+                    break;
+                case 4:
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -214,6 +221,35 @@ public class CreatePostActivity extends AppCompatActivity {
         int itemClickedId = item.getItemId();
         switch (itemClickedId) {
             case R.id.action_do_post:
+
+                SharedPreferences sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                String currentUserJson = sharedPreferences.getString("currentUser", "mitar123");
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    User currentUser = objectMapper.readValue(currentUserJson, User.class);
+                    boolean currentUserIsCommentator = false;
+                    for(Role role : currentUser.getRoles())
+                    {
+                        if(role.getRole().equalsIgnoreCase("ROLE_COMMENTATOR"))
+                        {
+                            currentUserIsCommentator = true;
+                            break;
+                        }
+                    }
+                    if(currentUserIsCommentator)
+                    {
+
+                        Toast.makeText(CreatePostActivity.this, "You are unauthorized for this action", Toast.LENGTH_LONG).show();
+                        finish();
+                        break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //*
+                String jwtToken = sharedPreferences.getString("token", "");
+                String token = "Bearer " + jwtToken;
+
                 //Pokusavam da dobavim lokaciju
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 {
@@ -258,7 +294,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 }
 
                 PostService postService = Util.retrofit.create(PostService.class);
-                final Call<Post> call = postService.create(post);
+                final Call<Post> call = postService.create(TokenProvider.getToken(getApplicationContext()), post);
                 call.enqueue(new Callback<Post>() {
                     @Override
                     public void onResponse(Call<Post> call, Response<Post> response)
